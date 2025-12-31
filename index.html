@@ -167,6 +167,25 @@
         const y = cy - r * Math.sin(currentAngle);
         const sinV = Math.sin(currentAngle), cosV = Math.cos(currentAngle);
 
+        //---ANGULOS---//
+        // Definimos los ángulos que queremos mostrar
+const gradosAMostrar = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330];
+
+gradosAMostrar.forEach(deg => {
+    const rad = deg * Math.PI / 180; // Convertimos a radianes
+    const offset = 25; // Distancia desde el borde del círculo
+    
+    // Calculamos la posición (x, y) sumando el offset al radio
+    const lx = cx + (r + offset) * Math.cos(rad);
+    const ly = cy - (r + offset) * Math.sin(rad);
+
+    circleCtx.font = '600 11px "Open Sans"';
+    circleCtx.fillStyle = '#999'; // Un gris suave para no saturar
+    circleCtx.textAlign = 'center';
+    circleCtx.textBaseline = 'middle';
+    circleCtx.fillText(deg + '°', lx, ly);
+});
+
         // --- DIBUJO CON ORDEN DE CAPAS ---
         
         if (Math.abs(sinV) > 0.001 && Math.abs(cosV) > 0.001) {
@@ -237,6 +256,31 @@
             graphCtx.fillStyle = colors[mode]; graphCtx.beginPath(); graphCtx.arc(mx, my, 7, 0, Math.PI * 2); graphCtx.fill();
             graphCtx.strokeStyle = '#fff'; graphCtx.lineWidth = 2; graphCtx.stroke();
         }
+
+        ---- VALORES GRAFICA ----
+        const etiquetasPi = [
+    { x: 50,  texto: '0' },
+    { x: 150, texto: 'π/2' },
+    { x: 250, texto: 'π' },
+    { x: 350, texto: '3π/2' },
+    { x: 450, texto: '2π' }
+];
+
+graphCtx.fillStyle = '#999';
+graphCtx.font = '700 12px "Open Sans"';
+graphCtx.textAlign = 'center';
+
+etiquetasPi.forEach(label => {
+    // Dibujamos el texto debajo del eje central
+    graphCtx.fillText(label.texto, label.x, midY + 25);
+    
+    // Opcional: Una pequeña marquita (tick) en el eje
+    graphCtx.beginPath();
+    graphCtx.moveTo(label.x, midY - 5);
+    graphCtx.lineTo(label.x, midY + 5);
+    graphCtx.strokeStyle = '#ddd';
+    graphCtx.stroke();
+});
     }
 
     function updateText() {
