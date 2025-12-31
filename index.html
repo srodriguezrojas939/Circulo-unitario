@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Circulo Unitario Final</title>
+    <title>Circulo unitario</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans:wght@400;600;700&display=swap');
@@ -24,7 +24,6 @@
         .header h1 { font-family: 'Playfair Display', serif; font-size: 34px; margin: 0; }
         .header p { font-family: 'Playfair Display', serif; font-size: 18px; color: #666; margin-top: 5px; font-weight: 700; }
 
-        /* Barra de Navegación */
         .mode-selector {
             display: inline-flex; flex-wrap: wrap; justify-content: center; background: #eee; padding: 5px; border-radius: 30px; 
             margin-bottom: 25px; gap: 5px; border: 1px solid #ddd;
@@ -35,13 +34,18 @@
         }
         .pill.active { border: 1px solid rgba(0,0,0,0.1); color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
-        /* PALETA DE COLORES DEFINITIVA */
-        .sin.active, .item-sin { background-color: #FF2D55; } /* Rojo */
-        .cos.active, .item-cos { background-color: #007AFF; } /* Azul */
-        .tan.active, .item-tan { background-color: #FF9500; } /* Naranja */
-        .csc.active, .item-csc { background-color: #28CD41; } /* Verde */
-        .sec.active, .item-sec { background-color: #D42E93; } /* NUEVO: Magenta */
-        .cot.active, .item-cot { background-color: #5AC8FA; } /* Cian */
+        /* COLORES Y TARJETAS */
+        .sin.active, .item-sin { background-color: #FF2D55; } 
+        .cos.active, .item-cos { background-color: #007AFF; } 
+        .tan.active, .item-tan { background-color: #FF9500; } 
+        .csc.active, .item-csc { background-color: #28CD41; } 
+        .sec.active, .item-sec { background-color: #fcdcf0; } /* Color Secante Solicitado */
+        .cot.active, .item-cot { background-color: #5AC8FA; } 
+        
+        /* Ajuste de texto para Secante (color claro) */
+        .item-sec { color: #555 !important; }
+        .item-sec .data-label, .item-sec .data-value, .item-sec .data-exact { color: #333 !important; }
+
         .pill.active { color: #fff !important; }
 
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
@@ -53,7 +57,6 @@
         }
         canvas { max-width: 100%; height: auto; z-index: 1; cursor: crosshair; }
 
-        /* NUEVO DISEÑO DE TARJETAS DE DATOS */
         .data-panel {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px; margin-top: 30px;
@@ -62,17 +65,16 @@
             padding: 15px; border-radius: 22px;
             display: flex; flex-direction: column; justify-content: center; min-height: 100px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            color: white; /* Texto blanco por defecto */
+            color: white;
         }
-        /* Tarjeta de Ángulo (se mantiene blanca) */
         .item-angle { background: white; border: 1px solid #ddd; color: #333; }
         .item-angle .data-label { color: #aaa; }
         .item-angle .data-value { color: #000; }
         .item-angle .data-exact { color: #555; }
 
-        .data-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; margin-bottom: 5px; }
-        .data-value { font-size: 20px; font-weight: 700; color: #fff; }
-        .data-exact { font-size: 15px; color: rgba(255,255,255,0.9); font-weight: 600; margin-top: 4px; }
+        .data-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.9); text-transform: uppercase; margin-bottom: 5px; }
+        .data-value { font-size: 20px; font-weight: 700; }
+        .data-exact { font-size: 15px; font-weight: 600; margin-top: 4px; color: rgba(255,255,255,0.85); }
     </style>
 </head>
 <body>
@@ -119,8 +121,7 @@
     let isDragging = false;
     let mode = 'sin';
     const allFuncs = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot'];
-    // Colores JS
-    const colors = { sin:'#FF2D55', cos:'#007AFF', tan:'#FF9500', csc:'#28CD41', sec:'#D42E93', cot:'#5AC8FA' };
+    const colors = { sin:'#FF2D55', cos:'#007AFF', tan:'#FF9500', csc:'#28CD41', sec:'#fcdcf0', cot:'#5AC8FA' };
 
     const exactValues = {
         0:   { sin:'0', cos:'1', tan:'0', csc:'∞', sec:'1', cot:'∞' },
@@ -144,17 +145,13 @@
         });
     }
 
-    function drawAll() {
-        drawCircle();
-        drawGraph();
-        updateText();
-    }
+    function drawAll() { drawCircle(); drawGraph(); updateText(); }
 
     function drawCircle() {
         const cx = 250, cy = 250, r = 160;
         circleCtx.clearRect(0, 0, 500, 500);
 
-        // Ejes y Etiquetas RESTAURADAS
+        // Fondo y Ejes
         circleCtx.strokeStyle = '#f0f0f0'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.moveTo(0, cy); circleCtx.lineTo(500, cy); circleCtx.moveTo(cx, 0); circleCtx.lineTo(cx, 500); circleCtx.stroke();
         
@@ -163,57 +160,49 @@
         circleCtx.textAlign = 'right'; circleCtx.fillText('-1', cx - r - 5, cy + 4);
         circleCtx.textAlign = 'center'; circleCtx.fillText('1', cx, cy - r - 5); circleCtx.fillText('-1', cx, cy + r + 15);
 
-        // Guías de ángulos
-        circleCtx.font = '600 10px "Open Sans"'; circleCtx.fillStyle = '#ccc';
-        [30, 45, 60, 120, 135, 150, 210, 225, 240, 300, 315, 330].forEach(deg => {
-            const rad = deg * Math.PI / 180;
-            circleCtx.fillText(deg + '°', cx + (r + 20) * Math.cos(rad), cy - (r + 20) * Math.sin(rad) + 4);
-        });
-
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.arc(cx, cy, r, 0, Math.PI * 2); circleCtx.stroke();
 
         const x = cx + r * Math.cos(currentAngle);
         const y = cy - r * Math.sin(currentAngle);
-        const sinVal = Math.sin(currentAngle);
-        const cosVal = Math.cos(currentAngle);
+        const sinV = Math.sin(currentAngle), cosV = Math.cos(currentAngle);
 
-        // --- DIBUJO DE FUNCIONES ---
-        circleCtx.lineWidth = 4;
-        circleCtx.strokeStyle = colors.cos; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke();
-        circleCtx.strokeStyle = colors.sin; circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
+        // --- DIBUJO CON ORDEN DE CAPAS ---
         
-        circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
-        circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
+        if (Math.abs(sinV) > 0.001 && Math.abs(cosV) > 0.001) {
+            const tanV = Math.tan(currentAngle), cotV = 1/tanV, secV = 1/cosV, cscV = 1/sinV;
+            const tanX = cx + r, tanY = cy - r * tanV;
+            const cotX = cx + r * cotV, cotY = cy - (sinV >= 0 ? r : -r);
+            const secX = cx + r * secV, cscY = cy - r * cscV;
 
-        if (Math.abs(sinVal) > 0.01 && Math.abs(cosVal) > 0.01) {
-            const tanVal = Math.tan(currentAngle);
-            const cotVal = 1 / tanVal;
-            const secVal = 1 / cosVal;
-            const cscVal = 1 / sinVal;
+            // 1. Lineas punteadas para todas las identidades
+            circleCtx.setLineDash([5, 5]); circleCtx.lineWidth = 2;
+            
+            circleCtx.strokeStyle = colors.sin; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(cx, y); circleCtx.stroke();
+            circleCtx.strokeStyle = colors.cos; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(x, cy); circleCtx.stroke();
+            circleCtx.strokeStyle = colors.tan; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(tanX, tanY); circleCtx.stroke();
+            circleCtx.strokeStyle = colors.cot; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
+            circleCtx.strokeStyle = colors.sec; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(secX, cy); circleCtx.stroke();
+            circleCtx.strokeStyle = colors.csc; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
+            
+            circleCtx.setLineDash([]);
 
-            const tanX = cx + r, tanY = cy - r * tanVal;
-            const cotX = cx + r * cotVal, cotY = cy - r * (sinVal>=0?1:-1);
-            const secX = cx + r * secVal;
-            const cscY = cy - r * cscVal;
-
-            circleCtx.lineWidth = 3;
-            circleCtx.strokeStyle = colors.tan; circleCtx.beginPath(); circleCtx.moveTo(tanX, cy); circleCtx.lineTo(tanX, tanY); circleCtx.stroke();
-            circleCtx.strokeStyle = colors.cot; circleCtx.beginPath(); circleCtx.moveTo(cx, cotY); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
+            // 2. Dibujo de segmentos (Secante se dibuja antes que Coseno)
+            circleCtx.lineWidth = 4;
             circleCtx.strokeStyle = colors.sec; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(secX, cy); circleCtx.stroke();
             circleCtx.strokeStyle = colors.csc; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
-
-            // LÍNEAS PUNTEADAS COLOREADAS DESDE EL ORIGEN
-            circleCtx.setLineDash([4, 4]); circleCtx.lineWidth = 2;
-            // Proyección a Secante/Tangente
-            circleCtx.strokeStyle = colors.sec; 
-            circleCtx.beginPath(); circleCtx.moveTo(cx,cy); circleCtx.lineTo(secX, cy); circleCtx.stroke();
-            // Proyección a Cosecante/Cotangente
-            circleCtx.strokeStyle = colors.csc;
-            circleCtx.beginPath(); circleCtx.moveTo(cx,cy); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
-            circleCtx.setLineDash([]);
+            circleCtx.strokeStyle = colors.tan; circleCtx.beginPath(); circleCtx.moveTo(tanX, cy); circleCtx.lineTo(tanX, tanY); circleCtx.stroke();
+            circleCtx.strokeStyle = colors.cot; circleCtx.beginPath(); circleCtx.moveTo(cx, cotY); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
         }
 
+        // 3. Seno y Coseno (Más anchos y encima de todo)
+        circleCtx.lineWidth = 7;
+        circleCtx.strokeStyle = colors.cos; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke();
+        circleCtx.strokeStyle = colors.sin; circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
+
+        // Radio y Punto
+        circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
+        circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
         circleCtx.fillStyle = '#fff'; circleCtx.beginPath(); circleCtx.arc(x, y, 8, 0, Math.PI * 2); circleCtx.fill();
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 3; circleCtx.stroke();
     }
@@ -221,40 +210,30 @@
     function drawGraph() {
         const w = 500, h = 500, midY = h / 2, amp = 120;
         graphCtx.clearRect(0, 0, 500, 500);
-        const funcs = { sin: Math.sin, cos: Math.cos, tan: Math.tan, csc: a => 1/Math.sin(a), sec: a => 1/Math.cos(a), cot: a => 1/Math.tan(a) };
+        const fns = { sin: Math.sin, cos: Math.cos, tan: Math.tan, csc: a => 1/Math.sin(a), sec: a => 1/Math.cos(a), cot: a => 1/Math.tan(a) };
 
-        // Ejes y Etiquetas RESTAURADAS
         graphCtx.strokeStyle = '#eee'; graphCtx.lineWidth = 2;
         graphCtx.beginPath(); graphCtx.moveTo(50, 0); graphCtx.lineTo(50, h); graphCtx.moveTo(0, midY); graphCtx.lineTo(w, midY); graphCtx.stroke();
 
         graphCtx.fillStyle = '#999'; graphCtx.font = '700 11px "Open Sans"';
         graphCtx.textAlign = 'right'; graphCtx.fillText('1', 45, midY - amp + 4); graphCtx.fillText('-1', 45, midY + amp + 4);
-        graphCtx.textAlign = 'center';
-        [{x:50,t:'0'},{x:150,t:'π/2'},{x:250,t:'π'},{x:350,t:'3π/2'},{x:450,t:'2π'}].forEach(l => {
-            graphCtx.fillText(l.t, l.x, midY + 20);
-            graphCtx.beginPath(); graphCtx.moveTo(l.x, midY-3); graphCtx.lineTo(l.x, midY+3); graphCtx.stroke();
-        });
-
+        
         graphCtx.strokeStyle = colors[mode]; graphCtx.lineWidth = 3;
         graphCtx.beginPath();
         for(let i = 0; i <= 400; i++) {
             const a = (i / 400) * Math.PI * 2;
-            let v = funcs[mode](a);
+            let v = fns[mode](a);
             if(Math.abs(v) > 15) v = v > 0 ? 15 : -15; 
             const py = midY - v * amp;
-            if (['tan','csc','sec','cot'].includes(mode) && Math.abs(funcs[mode](a)) > 10 && i > 0) { 
-                graphCtx.stroke(); graphCtx.beginPath(); 
-            } else {
-                if(i === 0) graphCtx.moveTo(50+i, py); else graphCtx.lineTo(50+i, py);
-            }
+            if (['tan','csc','sec','cot'].includes(mode) && Math.abs(fns[mode](a)) > 10 && i > 0) { graphCtx.stroke(); graphCtx.beginPath(); }
+            else { if(i === 0) graphCtx.moveTo(50+i, py); else graphCtx.lineTo(50+i, py); }
         }
         graphCtx.stroke();
 
-        let norm = currentAngle % (Math.PI * 2); if(norm < 0) norm += Math.PI * 2;
-        let vMark = funcs[mode](norm);
-        if(Math.abs(vMark) < 10) {
-            const mx = 50 + (norm / (Math.PI * 2)) * 400;
-            const my = midY - vMark * amp;
+        let n = currentAngle % (Math.PI * 2); if(n < 0) n += Math.PI * 2;
+        let vm = fns[mode](n);
+        if(Math.abs(vm) < 10) {
+            const mx = 50 + (n / (Math.PI * 2)) * 400, my = midY - vm * amp;
             graphCtx.fillStyle = colors[mode]; graphCtx.beginPath(); graphCtx.arc(mx, my, 7, 0, Math.PI * 2); graphCtx.fill();
             graphCtx.strokeStyle = '#fff'; graphCtx.lineWidth = 2; graphCtx.stroke();
         }
@@ -265,12 +244,12 @@
         let deg = Math.round(n * 180 / Math.PI);
         document.getElementById('val-angle').innerText = (n * 180 / Math.PI).toFixed(1) + '°';
         document.getElementById('exact-angle').innerText = (n / Math.PI).toFixed(2) + 'π rad';
-        const vals = { sin: Math.sin(n), cos: Math.cos(n), tan: Math.tan(n), csc: 1/Math.sin(n), sec: 1/Math.cos(n), cot: 1/Math.tan(n) };
+        const vs = { sin: Math.sin(n), cos: Math.cos(n), tan: Math.tan(n), csc: 1/Math.sin(n), sec: 1/Math.cos(n), cot: 1/Math.tan(n) };
         allFuncs.forEach(f => {
-            document.getElementById(`val-${f}`).innerText = Math.abs(vals[f]) > 50 ? '∞' : vals[f].toFixed(3);
+            document.getElementById(`val-${f}`).innerText = Math.abs(vs[f]) > 50 ? '∞' : vs[f].toFixed(3);
+            const ex = exactValues[deg % 360] || exactValues[360 - (deg % 360)];
+            document.getElementById(`exact-${f}`).innerText = ex ? ex[f] : '';
         });
-        const ex = exactValues[deg % 360] || exactValues[360 - (deg % 360)];
-        allFuncs.forEach(f => { document.getElementById(`exact-${f}`).innerText = ex ? ex[f] : ''; });
     }
 
     function handle(e) {
@@ -282,15 +261,10 @@
         let ang = Math.atan2(y, x);
         let deg = ang * 180 / Math.PI; if(deg < 0) deg += 360;
         const notables = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330, 360];
-        for(let n of notables) {
-            if(Math.abs(deg - n) < 2.5) {
-                ang = n * Math.PI / 180;
-                if("vibrate" in navigator && Math.abs(currentAngle - ang) > 0.01) navigator.vibrate(5);
-                break;
-            }
+        for(let nt of notables) {
+            if(Math.abs(deg - nt) < 2.5) { ang = nt * Math.PI / 180; break; }
         }
-        currentAngle = ang;
-        drawAll();
+        currentAngle = ang; drawAll();
     }
 
     circleCanvas.addEventListener('mousedown', () => isDragging = true);
@@ -299,8 +273,7 @@
     circleCanvas.addEventListener('touchstart', (e) => { isDragging = true; handle(e); });
     circleCanvas.addEventListener('touchmove', (e) => { isDragging && handle(e); e.preventDefault(); }, {passive: false});
 
-    renderPills();
-    drawAll();
+    renderPills(); drawAll();
 </script>
 </body>
 </html>
