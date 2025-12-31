@@ -160,6 +160,19 @@
         circleCtx.textAlign = 'right'; circleCtx.fillText('-1', cx - r - 5, cy + 4);
         circleCtx.textAlign = 'center'; circleCtx.fillText('1', cx, cy - r - 5); circleCtx.fillText('-1', cx, cy + r + 15);
 
+        // --- ADICIÓN: GRADOS EN EL CÍRCULO ---
+        const notablesDeg = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330];
+        notablesDeg.forEach(deg => {
+            const rad = deg * Math.PI / 180;
+            const lx = cx + (r + 25) * Math.cos(rad);
+            const ly = cy - (r + 25) * Math.sin(rad);
+            circleCtx.font = '600 11px "Open Sans"';
+            circleCtx.fillStyle = '#999';
+            circleCtx.textAlign = 'center';
+            circleCtx.textBaseline = 'middle';
+            circleCtx.fillText(deg + '°', lx, ly);
+        });
+
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.arc(cx, cy, r, 0, Math.PI * 2); circleCtx.stroke();
 
@@ -167,46 +180,21 @@
         const y = cy - r * Math.sin(currentAngle);
         const sinV = Math.sin(currentAngle), cosV = Math.cos(currentAngle);
 
-        //---ANGULOS---//
-        // Definimos los ángulos que queremos mostrar
-const gradosAMostrar = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330];
-
-gradosAMostrar.forEach(deg => {
-    const rad = deg * Math.PI / 180; // Convertimos a radianes
-    const offset = 25; // Distancia desde el borde del círculo
-    
-    // Calculamos la posición (x, y) sumando el offset al radio
-    const lx = cx + (r + offset) * Math.cos(rad);
-    const ly = cy - (r + offset) * Math.sin(rad);
-
-    circleCtx.font = '600 11px "Open Sans"';
-    circleCtx.fillStyle = '#999'; // Un gris suave para no saturar
-    circleCtx.textAlign = 'center';
-    circleCtx.textBaseline = 'middle';
-    circleCtx.fillText(deg + '°', lx, ly);
-});
-
-        // --- DIBUJO CON ORDEN DE CAPAS ---
-        
         if (Math.abs(sinV) > 0.001 && Math.abs(cosV) > 0.001) {
             const tanV = Math.tan(currentAngle), cotV = 1/tanV, secV = 1/cosV, cscV = 1/sinV;
             const tanX = cx + r, tanY = cy - r * tanV;
             const cotX = cx + r * cotV, cotY = cy - (sinV >= 0 ? r : -r);
             const secX = cx + r * secV, cscY = cy - r * cscV;
 
-            // 1. Lineas punteadas para todas las identidades
             circleCtx.setLineDash([5, 5]); circleCtx.lineWidth = 2;
-            
             circleCtx.strokeStyle = colors.sin; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(cx, y); circleCtx.stroke();
             circleCtx.strokeStyle = colors.cos; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(x, cy); circleCtx.stroke();
             circleCtx.strokeStyle = colors.tan; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(tanX, tanY); circleCtx.stroke();
             circleCtx.strokeStyle = colors.cot; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
             circleCtx.strokeStyle = colors.sec; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(secX, cy); circleCtx.stroke();
             circleCtx.strokeStyle = colors.csc; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
-            
             circleCtx.setLineDash([]);
 
-            // 2. Dibujo de segmentos (Secante se dibuja antes que Coseno)
             circleCtx.lineWidth = 4;
             circleCtx.strokeStyle = colors.sec; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(secX, cy); circleCtx.stroke();
             circleCtx.strokeStyle = colors.csc; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
@@ -214,12 +202,10 @@ gradosAMostrar.forEach(deg => {
             circleCtx.strokeStyle = colors.cot; circleCtx.beginPath(); circleCtx.moveTo(cx, cotY); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
         }
 
-        // 3. Seno y Coseno (Más anchos y encima de todo)
         circleCtx.lineWidth = 7;
         circleCtx.strokeStyle = colors.cos; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke();
         circleCtx.strokeStyle = colors.sin; circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
 
-        // Radio y Punto
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
         circleCtx.fillStyle = '#fff'; circleCtx.beginPath(); circleCtx.arc(x, y, 8, 0, Math.PI * 2); circleCtx.fill();
@@ -237,6 +223,20 @@ gradosAMostrar.forEach(deg => {
         graphCtx.fillStyle = '#999'; graphCtx.font = '700 11px "Open Sans"';
         graphCtx.textAlign = 'right'; graphCtx.fillText('1', 45, midY - amp + 4); graphCtx.fillText('-1', 45, midY + amp + 4);
         
+        // --- ADICIÓN: VALORES DE PI EN LA GRÁFICA ---
+        const labelsPi = [
+            { x: 50,  t: '0' },
+            { x: 150, t: 'π/2' },
+            { x: 250, t: 'π' },
+            { x: 350, t: '3π/2' },
+            { x: 450, t: '2π' }
+        ];
+        graphCtx.textAlign = 'center';
+        labelsPi.forEach(l => {
+            graphCtx.fillText(l.t, l.x, midY + 25);
+            graphCtx.beginPath(); graphCtx.moveTo(l.x, midY - 5); graphCtx.lineTo(l.x, midY + 5); graphCtx.stroke();
+        });
+
         graphCtx.strokeStyle = colors[mode]; graphCtx.lineWidth = 3;
         graphCtx.beginPath();
         for(let i = 0; i <= 400; i++) {
@@ -256,31 +256,6 @@ gradosAMostrar.forEach(deg => {
             graphCtx.fillStyle = colors[mode]; graphCtx.beginPath(); graphCtx.arc(mx, my, 7, 0, Math.PI * 2); graphCtx.fill();
             graphCtx.strokeStyle = '#fff'; graphCtx.lineWidth = 2; graphCtx.stroke();
         }
-
-        ---- VALORES GRAFICA ----
-        const etiquetasPi = [
-    { x: 50,  texto: '0' },
-    { x: 150, texto: 'π/2' },
-    { x: 250, texto: 'π' },
-    { x: 350, texto: '3π/2' },
-    { x: 450, texto: '2π' }
-];
-
-graphCtx.fillStyle = '#999';
-graphCtx.font = '700 12px "Open Sans"';
-graphCtx.textAlign = 'center';
-
-etiquetasPi.forEach(label => {
-    // Dibujamos el texto debajo del eje central
-    graphCtx.fillText(label.texto, label.x, midY + 25);
-    
-    // Opcional: Una pequeña marquita (tick) en el eje
-    graphCtx.beginPath();
-    graphCtx.moveTo(label.x, midY - 5);
-    graphCtx.lineTo(label.x, midY + 5);
-    graphCtx.strokeStyle = '#ddd';
-    graphCtx.stroke();
-});
     }
 
     function updateText() {
