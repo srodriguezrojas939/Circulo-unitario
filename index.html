@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trigonometría Master Pro - Color Fix</title>
+    <title>Circulo Unitario Final</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans:wght@400;600;700&display=swap');
@@ -21,9 +21,10 @@
         }
 
         .header { margin-bottom: 25px; }
-        .header h1 { font-family: 'Playfair Display', serif; font-size: 32px; margin: 0; }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 34px; margin: 0; }
         .header p { font-family: 'Playfair Display', serif; font-size: 18px; color: #666; margin-top: 5px; font-weight: 700; }
 
+        /* Barra de Navegación */
         .mode-selector {
             display: inline-flex; flex-wrap: wrap; justify-content: center; background: #eee; padding: 5px; border-radius: 30px; 
             margin-bottom: 25px; gap: 5px; border: 1px solid #ddd;
@@ -32,15 +33,15 @@
             padding: 10px 16px; border-radius: 25px; cursor: pointer; font-size: 11px;
             font-weight: 700; transition: 0.3s; color: #888; text-transform: uppercase; border: 1px solid transparent;
         }
-        .pill.active { border: 1px solid rgba(0,0,0,0.1); color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .pill.active { border: 1px solid rgba(0,0,0,0.1); color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
-        /* PALETA DE COLORES ACTUALIZADA */
-        .sin.active, .color-sin { background-color: #FF2D55; color: #FF2D55; } /* Rojo */
-        .cos.active, .color-cos { background-color: #007AFF; color: #007AFF; } /* Azul */
-        .tan.active, .color-tan { background-color: #FF9500; color: #FF9500; } /* Naranja */
-        .csc.active, .color-csc { background-color: #28CD41; color: #28CD41; } /* VERDE ESMERALDA (NUEVO) */
-        .sec.active, .color-sec { background-color: #5856D6; color: #5856D6; } /* Índigo */
-        .cot.active, .color-cot { background-color: #5AC8FA; color: #5AC8FA; } /* Cian */
+        /* PALETA DE COLORES DEFINITIVA */
+        .sin.active, .item-sin { background-color: #FF2D55; } /* Rojo */
+        .cos.active, .item-cos { background-color: #007AFF; } /* Azul */
+        .tan.active, .item-tan { background-color: #FF9500; } /* Naranja */
+        .csc.active, .item-csc { background-color: #28CD41; } /* Verde */
+        .sec.active, .item-sec { background-color: #D42E93; } /* NUEVO: Magenta */
+        .cot.active, .item-cot { background-color: #5AC8FA; } /* Cian */
         .pill.active { color: #fff !important; }
 
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
@@ -52,24 +53,33 @@
         }
         canvas { max-width: 100%; height: auto; z-index: 1; cursor: crosshair; }
 
+        /* NUEVO DISEÑO DE TARJETAS DE DATOS */
         .data-panel {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px; margin-top: 30px;
         }
         .data-item {
-            background: white; padding: 15px; border-radius: 22px; border: 1px solid #ddd;
-            display: flex; flex-direction: column; justify-content: center; min-height: 90px;
+            padding: 15px; border-radius: 22px;
+            display: flex; flex-direction: column; justify-content: center; min-height: 100px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            color: white; /* Texto blanco por defecto */
         }
-        .data-label { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
-        .data-value { font-size: 16px; font-weight: 700; color: #000; }
-        .data-exact { font-size: 14px; color: #555; font-weight: 600; margin-top: 4px; }
+        /* Tarjeta de Ángulo (se mantiene blanca) */
+        .item-angle { background: white; border: 1px solid #ddd; color: #333; }
+        .item-angle .data-label { color: #aaa; }
+        .item-angle .data-value { color: #000; }
+        .item-angle .data-exact { color: #555; }
+
+        .data-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; margin-bottom: 5px; }
+        .data-value { font-size: 20px; font-weight: 700; color: #fff; }
+        .data-exact { font-size: 15px; color: rgba(255,255,255,0.9); font-weight: 600; margin-top: 4px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>Círculo Unitario Pro</h1>
+        <h1>Circulo unitario</h1>
         <p>√(Raíz) Cuadrada²</p>
     </div>
 
@@ -85,17 +95,17 @@
     </div>
 
     <div class="data-panel">
-        <div class="data-item">
+        <div class="data-item item-angle">
             <div class="data-label">Ángulo</div>
             <div class="data-value" id="val-angle">0.0°</div>
             <div class="data-exact" id="exact-angle">0 rad</div>
         </div>
-        <div class="data-item"><div class="data-label color-sin">Seno</div><div class="data-value" id="val-sin">0.000</div><div class="data-exact" id="exact-sin"></div></div>
-        <div class="data-item"><div class="data-label color-cos">Coseno</div><div class="data-value" id="val-cos">1.000</div><div class="data-exact" id="exact-cos"></div></div>
-        <div class="data-item"><div class="data-label color-tan">Tangente</div><div class="data-value" id="val-tan">0.000</div><div class="data-exact" id="exact-tan"></div></div>
-        <div class="data-item"><div class="data-label color-csc">Cosecante</div><div class="data-value" id="val-csc">∞</div><div class="data-exact" id="exact-csc"></div></div>
-        <div class="data-item"><div class="data-label color-sec">Secante</div><div class="data-value" id="val-sec">1.000</div><div class="data-exact" id="exact-sec"></div></div>
-        <div class="data-item"><div class="data-label color-cot">Cotangente</div><div class="data-value" id="val-cot">∞</div><div class="data-exact" id="exact-cot"></div></div>
+        <div class="data-item item-sin"><div class="data-label">Seno</div><div class="data-value" id="val-sin">0.000</div><div class="data-exact" id="exact-sin"></div></div>
+        <div class="data-item item-cos"><div class="data-label">Coseno</div><div class="data-value" id="val-cos">1.000</div><div class="data-exact" id="exact-cos"></div></div>
+        <div class="data-item item-tan"><div class="data-label">Tangente</div><div class="data-value" id="val-tan">0.000</div><div class="data-exact" id="exact-tan"></div></div>
+        <div class="data-item item-csc"><div class="data-label">Cosecante</div><div class="data-value" id="val-csc">∞</div><div class="data-exact" id="exact-csc"></div></div>
+        <div class="data-item item-sec"><div class="data-label">Secante</div><div class="data-value" id="val-sec">1.000</div><div class="data-exact" id="exact-sec"></div></div>
+        <div class="data-item item-cot"><div class="data-label">Cotangente</div><div class="data-value" id="val-cot">∞</div><div class="data-exact" id="exact-cot"></div></div>
     </div>
 </div>
 
@@ -109,6 +119,8 @@
     let isDragging = false;
     let mode = 'sin';
     const allFuncs = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot'];
+    // Colores JS
+    const colors = { sin:'#FF2D55', cos:'#007AFF', tan:'#FF9500', csc:'#28CD41', sec:'#D42E93', cot:'#5AC8FA' };
 
     const exactValues = {
         0:   { sin:'0', cos:'1', tan:'0', csc:'∞', sec:'1', cot:'∞' },
@@ -142,6 +154,7 @@
         const cx = 250, cy = 250, r = 160;
         circleCtx.clearRect(0, 0, 500, 500);
 
+        // Ejes y Etiquetas RESTAURADAS
         circleCtx.strokeStyle = '#f0f0f0'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.moveTo(0, cy); circleCtx.lineTo(500, cy); circleCtx.moveTo(cx, 0); circleCtx.lineTo(cx, 500); circleCtx.stroke();
         
@@ -149,6 +162,13 @@
         circleCtx.textAlign = 'left'; circleCtx.fillText('1', cx + r + 5, cy + 4);
         circleCtx.textAlign = 'right'; circleCtx.fillText('-1', cx - r - 5, cy + 4);
         circleCtx.textAlign = 'center'; circleCtx.fillText('1', cx, cy - r - 5); circleCtx.fillText('-1', cx, cy + r + 15);
+
+        // Guías de ángulos
+        circleCtx.font = '600 10px "Open Sans"'; circleCtx.fillStyle = '#ccc';
+        [30, 45, 60, 120, 135, 150, 210, 225, 240, 300, 315, 330].forEach(deg => {
+            const rad = deg * Math.PI / 180;
+            circleCtx.fillText(deg + '°', cx + (r + 20) * Math.cos(rad), cy - (r + 20) * Math.sin(rad) + 4);
+        });
 
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.arc(cx, cy, r, 0, Math.PI * 2); circleCtx.stroke();
@@ -158,10 +178,10 @@
         const sinVal = Math.sin(currentAngle);
         const cosVal = Math.cos(currentAngle);
 
-        // --- DIBUJO ---
+        // --- DIBUJO DE FUNCIONES ---
         circleCtx.lineWidth = 4;
-        circleCtx.strokeStyle = '#007AFF'; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke(); // Cos
-        circleCtx.strokeStyle = '#FF2D55'; circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke(); // Sin
+        circleCtx.strokeStyle = colors.cos; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke();
+        circleCtx.strokeStyle = colors.sin; circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
         
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
@@ -178,13 +198,19 @@
             const cscY = cy - r * cscVal;
 
             circleCtx.lineWidth = 3;
-            circleCtx.strokeStyle = '#FF9500'; circleCtx.beginPath(); circleCtx.moveTo(tanX, cy); circleCtx.lineTo(tanX, tanY); circleCtx.stroke(); // Tan
-            circleCtx.strokeStyle = '#5AC8FA'; circleCtx.beginPath(); circleCtx.moveTo(cx, cotY); circleCtx.lineTo(cotX, cotY); circleCtx.stroke(); // Cot
-            circleCtx.strokeStyle = '#5856D6'; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(secX, cy); circleCtx.stroke(); // Sec
-            circleCtx.strokeStyle = '#28CD41'; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cx, cscY); circleCtx.stroke(); // Csc (VERDE)
+            circleCtx.strokeStyle = colors.tan; circleCtx.beginPath(); circleCtx.moveTo(tanX, cy); circleCtx.lineTo(tanX, tanY); circleCtx.stroke();
+            circleCtx.strokeStyle = colors.cot; circleCtx.beginPath(); circleCtx.moveTo(cx, cotY); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
+            circleCtx.strokeStyle = colors.sec; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(secX, cy); circleCtx.stroke();
+            circleCtx.strokeStyle = colors.csc; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
 
-            circleCtx.setLineDash([3, 4]); circleCtx.lineWidth = 1; circleCtx.strokeStyle = '#aaa';
-            circleCtx.beginPath(); circleCtx.moveTo(x,y); circleCtx.lineTo(secX, cscY); circleCtx.moveTo(cx,cy); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
+            // LÍNEAS PUNTEADAS COLOREADAS DESDE EL ORIGEN
+            circleCtx.setLineDash([4, 4]); circleCtx.lineWidth = 2;
+            // Proyección a Secante/Tangente
+            circleCtx.strokeStyle = colors.sec; 
+            circleCtx.beginPath(); circleCtx.moveTo(cx,cy); circleCtx.lineTo(secX, cy); circleCtx.stroke();
+            // Proyección a Cosecante/Cotangente
+            circleCtx.strokeStyle = colors.csc;
+            circleCtx.beginPath(); circleCtx.moveTo(cx,cy); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
             circleCtx.setLineDash([]);
         }
 
@@ -195,13 +221,19 @@
     function drawGraph() {
         const w = 500, h = 500, midY = h / 2, amp = 120;
         graphCtx.clearRect(0, 0, 500, 500);
-
-        // COLORES EN GRÁFICA ACTUALIZADOS
-        const colors = { sin:'#FF2D55', cos:'#007AFF', tan:'#FF9500', csc:'#28CD41', sec:'#5856D6', cot:'#5AC8FA' };
         const funcs = { sin: Math.sin, cos: Math.cos, tan: Math.tan, csc: a => 1/Math.sin(a), sec: a => 1/Math.cos(a), cot: a => 1/Math.tan(a) };
 
+        // Ejes y Etiquetas RESTAURADAS
         graphCtx.strokeStyle = '#eee'; graphCtx.lineWidth = 2;
         graphCtx.beginPath(); graphCtx.moveTo(50, 0); graphCtx.lineTo(50, h); graphCtx.moveTo(0, midY); graphCtx.lineTo(w, midY); graphCtx.stroke();
+
+        graphCtx.fillStyle = '#999'; graphCtx.font = '700 11px "Open Sans"';
+        graphCtx.textAlign = 'right'; graphCtx.fillText('1', 45, midY - amp + 4); graphCtx.fillText('-1', 45, midY + amp + 4);
+        graphCtx.textAlign = 'center';
+        [{x:50,t:'0'},{x:150,t:'π/2'},{x:250,t:'π'},{x:350,t:'3π/2'},{x:450,t:'2π'}].forEach(l => {
+            graphCtx.fillText(l.t, l.x, midY + 20);
+            graphCtx.beginPath(); graphCtx.moveTo(l.x, midY-3); graphCtx.lineTo(l.x, midY+3); graphCtx.stroke();
+        });
 
         graphCtx.strokeStyle = colors[mode]; graphCtx.lineWidth = 3;
         graphCtx.beginPath();
