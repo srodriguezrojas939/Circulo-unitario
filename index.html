@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Estación Trigonométrica Completa</title>
+    <title>Trigonometría Master Pro</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans:wght@400;600;700&display=swap');
@@ -11,116 +11,66 @@
         * { touch-action: manipulation; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            background: #ffffff; 
-            margin: 0; 
-            padding: 20px; 
-            font-family: 'Open Sans', sans-serif; 
-            display: flex; 
-            justify-content: center;
-            color: #333;
+            background: #ffffff; margin: 0; padding: 20px; 
+            font-family: 'Open Sans', sans-serif; display: flex; justify-content: center; color: #333;
         }
 
-        /* Contenedor Gris Principal (Sin borde) */
         .container { 
-            width: 100%; 
-            max-width: 1100px; 
-            background: #F2F2F2; 
-            padding: 40px 20px; 
-            border-radius: 50px; 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.05);
-            text-align: center;
+            width: 100%; max-width: 1100px; background: #F2F2F2; padding: 40px 20px; 
+            border-radius: 50px; box-shadow: 0 20px 60px rgba(0,0,0,0.05); text-align: center;
         }
 
-        .header { margin-bottom: 25px; }
+        .header { margin-bottom: 20px; }
         .header h1 { font-family: 'Playfair Display', serif; font-size: 32px; margin: 0; }
         .header p { font-family: 'Playfair Display', serif; font-size: 18px; color: #666; margin-top: 5px; font-weight: 700; }
 
-        /* Selector con mini-borde */
+        /* Selector de Funciones Activas */
+        .function-manager {
+            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .toggle-btn {
+            padding: 6px 12px; border-radius: 15px; border: 1px solid #ddd; background: #fff;
+            font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.3s; color: #888;
+        }
+        .toggle-btn.active { background: #333; color: #fff; border-color: #333; }
+
+        /* Barra de Navegación de Gráficas */
         .mode-selector {
-            display: inline-flex;
-            background: #eee;
-            padding: 5px;
-            border-radius: 30px;
-            margin-bottom: 30px;
-            gap: 5px;
-            border: 1px solid #ddd;
+            display: inline-flex; background: #eee; padding: 5px; border-radius: 30px; 
+            margin-bottom: 25px; gap: 5px; border: 1px solid #ddd;
         }
-
         .pill {
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 700;
-            transition: 0.3s;
-            color: #888;
-            text-transform: uppercase;
-            border: 1px solid transparent;
+            padding: 10px 18px; border-radius: 25px; cursor: pointer; font-size: 12px;
+            font-weight: 700; transition: 0.3s; color: #888; text-transform: uppercase; border: 1px solid transparent;
         }
-
         .pill.active { border: 1px solid rgba(0,0,0,0.1); color: #fff; }
         .pill.active.sin { background: #FF2D55; }
         .pill.active.cos { background: #007AFF; }
         .pill.active.tan { background: #FF9500; }
+        .pill.active.csc { background: #AF52DE; }
+        .pill.active.sec { background: #5856D6; }
+        .pill.active.cot { background: #5AC8FA; }
 
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            align-items: center;
-        }
-
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
         @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
-        /* Tarjetas con mini-borde */
         .canvas-card {
-            background: white;
-            border-radius: 35px;
-            padding: 25px;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-            border: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background: white; border-radius: 35px; padding: 25px; position: relative;
+            border: 1px solid #ddd; display: flex; flex-direction: column; align-items: center;
         }
+        canvas { max-width: 100%; height: auto; z-index: 1; cursor: crosshair; }
 
-        canvas { max-width: 100%; height: auto; z-index: 1; }
-
-        .quadrant {
-            position: absolute;
-            font-size: 32px;
-            font-weight: 700;
-            color: #f8f8f8;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Panel de Datos con mini-borde en items */
         .data-panel {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            margin-top: 30px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px; margin-top: 30px;
         }
-
         .data-item {
-            background: white;
-            padding: 18px;
-            border-radius: 25px;
-            border: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            background: white; padding: 18px; border-radius: 25px; border: 1px solid #ddd;
+            display: flex; flex-direction: column; justify-content: center; min-height: 100px;
         }
-
         .data-label { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
-        .data-value { font-size: 17px; font-weight: 700; color: #000; }
-        .data-sub { font-size: 13px; color: #888; font-weight: 600; margin-top: 3px; }
-        
-        .color-sin { color: #FF2D55; }
-        .color-cos { color: #007AFF; }
-        .color-tan { color: #FF9500; }
+        .data-value { font-size: 18px; font-weight: 700; color: #000; }
+        .data-exact { font-size: 14px; color: #007AFF; font-weight: 600; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -131,21 +81,22 @@
         <p>√(Raíz) Cuadrada²</p>
     </div>
 
-    <div class="mode-selector">
-        <div class="pill active sin" onclick="setMode('sin', this)">Seno</div>
-        <div class="pill cos" onclick="setMode('cos', this)">Coseno</div>
-        <div class="pill tan" onclick="setMode('tan', this)">Tangente</div>
+    <div class="function-manager" id="manager">
+        <button class="toggle-btn active" onclick="toggleVisibility('sin')">Seno</button>
+        <button class="toggle-btn active" onclick="toggleVisibility('cos')">Coseno</button>
+        <button class="toggle-btn active" onclick="toggleVisibility('tan')">Tangente</button>
+        <button class="toggle-btn" onclick="toggleVisibility('csc')">Csc</button>
+        <button class="toggle-btn" onclick="toggleVisibility('sec')">Sec</button>
+        <button class="toggle-btn" onclick="toggleVisibility('cot')">Cot</button>
     </div>
+
+    <div class="mode-selector" id="pills-container">
+        </div>
 
     <div class="main-grid">
         <div class="canvas-card">
-            <div class="quadrant" style="top:30px; right:40px;">I</div>
-            <div class="quadrant" style="top:30px; left:40px;">II</div>
-            <div class="quadrant" style="bottom:30px; left:40px;">III</div>
-            <div class="quadrant" style="bottom:30px; right:40px;">IV</div>
             <canvas id="circleCanvas" width="500" height="500"></canvas>
         </div>
-
         <div class="canvas-card">
             <canvas id="graphCanvas" width="500" height="500"></canvas>
         </div>
@@ -153,21 +104,24 @@
 
     <div class="data-panel">
         <div class="data-item">
-            <div class="data-label">Ángulo (θ)</div>
+            <div class="data-label">Ángulo</div>
             <div class="data-value" id="val-angle">0.0°</div>
-            <div class="data-sub" id="val-rads">0.00 rad | 0.00π</div>
+            <div class="data-exact" id="exact-angle">0 rad</div>
         </div>
         <div class="data-item">
-            <div class="data-label color-sin">Seno (y)</div>
+            <div class="data-label">Seno</div>
             <div class="data-value" id="val-sin">0.000</div>
+            <div class="data-exact" id="exact-sin">0</div>
         </div>
         <div class="data-item">
-            <div class="data-label color-cos">Coseno (x)</div>
+            <div class="data-label">Coseno</div>
             <div class="data-value" id="val-cos">1.000</div>
+            <div class="data-exact" id="exact-cos">1</div>
         </div>
         <div class="data-item">
-            <div class="data-label color-tan">Tangente</div>
+            <div class="data-label">Tangente</div>
             <div class="data-value" id="val-tan">0.000</div>
+            <div class="data-exact" id="exact-tan">0</div>
         </div>
     </div>
 </div>
@@ -181,12 +135,47 @@
     let currentAngle = 0; 
     let isDragging = false;
     let mode = 'sin';
+    const activeFuncs = { sin: true, cos: true, tan: true, csc: false, sec: false, cot: false };
 
-    function setMode(m, el) {
-        mode = m;
-        document.querySelectorAll('.pill').forEach(p => p.className = 'pill');
-        el.classList.add('active', m);
+    // Valores Exactos (Mapeo de ángulos notables)
+    const exactValues = {
+        0:   { sin: '0', cos: '1', tan: '0' },
+        30:  { sin: '1/2', cos: '√3/2', tan: '√3/3' },
+        45:  { sin: '√2/2', cos: '√2/2', tan: '1' },
+        60:  { sin: '√3/2', cos: '1/2', tan: '√3' },
+        90:  { sin: '1', cos: '0', tan: '∞' },
+        180: { sin: '0', cos: '-1', tan: '0' },
+        270: { sin: '-1', cos: '0', tan: '∞' }
+    };
+
+    function toggleVisibility(f) {
+        activeFuncs[f] = !activeFuncs[f];
+        renderPills();
+        if(!activeFuncs[mode]) mode = Object.keys(activeFuncs).find(k => activeFuncs[k]);
+        updateManagerButtons();
         drawAll();
+    }
+
+    function renderPills() {
+        const container = document.getElementById('pills-container');
+        container.innerHTML = '';
+        Object.keys(activeFuncs).forEach(f => {
+            if(activeFuncs[f]) {
+                const p = document.createElement('div');
+                p.className = `pill ${f} ${mode === f ? 'active' : ''}`;
+                p.innerText = f.toUpperCase();
+                p.onclick = () => { mode = f; renderPills(); drawAll(); };
+                container.appendChild(p);
+            }
+        });
+    }
+
+    function updateManagerButtons() {
+        const btns = document.querySelectorAll('.toggle-btn');
+        btns.forEach(b => {
+            const func = b.innerText.toLowerCase().replace('seno', 'sin').replace('coseno', 'cos').replace('tangente', 'tan');
+            b.className = `toggle-btn ${activeFuncs[func] ? 'active' : ''}`;
+        });
     }
 
     function drawAll() {
@@ -199,107 +188,98 @@
         const cx = 250, cy = 250, r = 180;
         circleCtx.clearRect(0, 0, 500, 500);
 
-        // Guías de ángulos notables
-        circleCtx.font = '700 11px "Open Sans"'; circleCtx.fillStyle = '#bbb'; circleCtx.textAlign = 'center';
-        [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330].forEach(deg => {
-            const rad = deg * Math.PI / 180;
-            circleCtx.fillText(deg + '°', cx + (r + 30) * Math.cos(rad), cy - (r + 30) * Math.sin(rad) + 4);
-        });
-
-        // Ejes
-        circleCtx.strokeStyle = '#f0f0f0'; circleCtx.lineWidth = 2;
-        circleCtx.beginPath(); circleCtx.moveTo(0, cy); circleCtx.lineTo(500, cy); circleCtx.moveTo(cx, 0); circleCtx.lineTo(cx, 500); circleCtx.stroke();
-
-        // Círculo Principal
+        // Guías
+        circleCtx.strokeStyle = '#f0f0f0'; circleCtx.beginPath();
+        circleCtx.moveTo(0, cy); circleCtx.lineTo(500, cy); circleCtx.moveTo(cx, 0); circleCtx.lineTo(cx, 500); circleCtx.stroke();
+        
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 3;
         circleCtx.beginPath(); circleCtx.arc(cx, cy, r, 0, Math.PI * 2); circleCtx.stroke();
 
         const x = cx + r * Math.cos(currentAngle);
         const y = cy - r * Math.sin(currentAngle);
 
-        // Seno (Rojo) y Coseno (Azul)
-        circleCtx.strokeStyle = '#007AFF'; circleCtx.lineWidth = 5;
-        circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke();
-        circleCtx.strokeStyle = '#FF2D55'; circleCtx.lineWidth = 5;
-        circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
+        // Seno y Coseno siempre visibles
+        circleCtx.lineWidth = 5;
+        circleCtx.strokeStyle = '#007AFF'; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke();
+        circleCtx.strokeStyle = '#FF2D55'; circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
 
-        // Tangente (Naranja)
-        if (Math.abs(Math.cos(currentAngle)) > 0.05) {
-            circleCtx.strokeStyle = '#FF9500'; circleCtx.lineWidth = 5;
-            circleCtx.beginPath(); circleCtx.moveTo(cx + r, cy); circleCtx.lineTo(cx + r, cy - r * Math.tan(currentAngle)); circleCtx.stroke();
+        if (Math.abs(Math.cos(currentAngle)) > 0.02) {
+            circleCtx.strokeStyle = '#FF9500'; circleCtx.beginPath(); 
+            circleCtx.moveTo(cx + r, cy); circleCtx.lineTo(cx + r, cy - r * Math.tan(currentAngle)); circleCtx.stroke();
         }
 
-        // Punto
         circleCtx.fillStyle = '#000'; circleCtx.beginPath(); circleCtx.arc(x, y, 10, 0, Math.PI * 2); circleCtx.fill();
-        circleCtx.strokeStyle = '#fff'; circleCtx.lineWidth = 3; circleCtx.stroke();
     }
 
     function drawGraph() {
-        const w = 500, h = 500, midY = h / 2, amp = 140;
+        const w = 500, h = 500, midY = h / 2, amp = 130;
         graphCtx.clearRect(0, 0, 500, 500);
 
-        // Ejes y Etiquetas de Pi
-        graphCtx.strokeStyle = '#eee'; graphCtx.lineWidth = 2;
-        graphCtx.beginPath(); graphCtx.moveTo(50, 0); graphCtx.lineTo(50, h); graphCtx.moveTo(0, midY); graphCtx.lineTo(w, midY); graphCtx.stroke();
+        const colors = { sin:'#FF2D55', cos:'#007AFF', tan:'#FF9500', csc:'#AF52DE', sec:'#5856D6', cot:'#5AC8FA' };
+        const funcs = { sin: Math.sin, cos: Math.cos, tan: Math.tan, csc: a => 1/Math.sin(a), sec: a => 1/Math.cos(a), cot: a => 1/Math.tan(a) };
 
-        graphCtx.fillStyle = '#aaa'; graphCtx.font = '700 12px "Open Sans"'; graphCtx.textAlign = 'center';
-        const labels = [
-            { x: 50, t: '0' },
-            { x: 150, t: 'π/2' },
-            { x: 250, t: 'π' },
-            { x: 350, t: '3π/2' },
-            { x: 450, t: '2π' }
-        ];
-        labels.forEach(l => {
-            graphCtx.fillText(l.t, l.x, midY + 25);
-            graphCtx.beginPath(); graphCtx.moveTo(l.x, midY-5); graphCtx.lineTo(l.x, midY+5); graphCtx.stroke();
-        });
+        graphCtx.strokeStyle = '#eee'; graphCtx.beginPath();
+        graphCtx.moveTo(50, 0); graphCtx.lineTo(50, h); graphCtx.moveTo(0, midY); graphCtx.lineTo(w, midY); graphCtx.stroke();
 
-        // Valores en Y
-        graphCtx.textAlign = 'right';
-        graphCtx.fillText('1', 40, midY - amp + 5);
-        graphCtx.fillText('-1', 40, midY + amp + 5);
-
-        // Dibujo de Curva
-        let color = '#FF2D55'; let func = Math.sin;
-        if(mode === 'cos') { color = '#007AFF'; func = Math.cos; }
-        if(mode === 'tan') { color = '#FF9500'; func = Math.tan; }
-
-        graphCtx.strokeStyle = color; graphCtx.lineWidth = 4;
+        graphCtx.strokeStyle = colors[mode]; graphCtx.lineWidth = 4;
         graphCtx.beginPath();
         for(let i = 0; i <= 400; i++) {
             const a = (i / 400) * Math.PI * 2;
-            const v = func(a);
+            const v = funcs[mode](a);
             const py = midY - v * amp;
-            if (mode === 'tan' && Math.abs(v) > 8) { graphCtx.stroke(); graphCtx.beginPath(); }
+            if (Math.abs(v) > 10) { graphCtx.stroke(); graphCtx.beginPath(); }
             else { if(i === 0) graphCtx.moveTo(50+i, py); else graphCtx.lineTo(50+i, py); }
         }
         graphCtx.stroke();
 
-        // Marcador
         let norm = currentAngle % (Math.PI * 2); if(norm < 0) norm += Math.PI * 2;
         const mx = 50 + (norm / (Math.PI * 2)) * 400;
-        const my = midY - func(norm) * amp;
-        if(mode !== 'tan' || Math.abs(func(norm)) < 8) {
-            graphCtx.fillStyle = color; graphCtx.beginPath(); graphCtx.arc(mx, my, 8, 0, Math.PI * 2); graphCtx.fill();
-            graphCtx.strokeStyle = '#fff'; graphCtx.lineWidth = 2; graphCtx.stroke();
+        const my = midY - funcs[mode](norm) * amp;
+        if(Math.abs(funcs[mode](norm)) < 10) {
+            graphCtx.fillStyle = colors[mode]; graphCtx.beginPath(); graphCtx.arc(mx, my, 8, 0, Math.PI * 2); graphCtx.fill();
         }
     }
 
     function updateText() {
         let n = currentAngle % (Math.PI * 2); if(n < 0) n += Math.PI * 2;
+        let deg = Math.round(n * 180 / Math.PI);
+        
         document.getElementById('val-angle').innerText = (n * 180 / Math.PI).toFixed(1) + '°';
-        document.getElementById('val-rads').innerText = `${n.toFixed(2)} rad | ${(n / Math.PI).toFixed(2)}π`;
-        document.getElementById('val-sin').innerText = Math.sin(n).toFixed(3);
-        document.getElementById('val-cos').innerText = Math.cos(n).toFixed(3);
-        const t = Math.tan(n); document.getElementById('val-tan').innerText = Math.abs(t) > 50 ? '∞' : t.toFixed(3);
+        document.getElementById('exact-angle').innerText = (n / Math.PI).toFixed(2) + 'π rad';
+        
+        const s = Math.sin(n), c = Math.cos(n), t = Math.tan(n);
+        document.getElementById('val-sin').innerText = s.toFixed(3);
+        document.getElementById('val-cos').innerText = c.toFixed(3);
+        document.getElementById('val-tan').innerText = Math.abs(t) > 20 ? '∞' : t.toFixed(3);
+
+        // Mostrar exactos si hay snap
+        const ex = exactValues[deg % 360] || exactValues[360 - (deg % 360)];
+        document.getElementById('exact-sin').innerText = ex ? ex.sin : '';
+        document.getElementById('exact-cos').innerText = ex ? ex.cos : '';
+        document.getElementById('exact-tan').innerText = ex ? ex.tan : '';
     }
 
     function handle(e) {
         const rect = circleCanvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        currentAngle = Math.atan2(250 - (clientY - rect.top) * (500 / rect.height), (clientX - rect.left) * (500 / rect.width) - 250);
+        let x = (clientX - rect.left) * (500 / rect.width) - 250;
+        let y = 250 - (clientY - rect.top) * (500 / rect.height);
+        
+        let ang = Math.atan2(y, x);
+        let deg = ang * 180 / Math.PI; if(deg < 0) deg += 360;
+
+        // --- EFECTO IMÁN (Snap) ---
+        const notables = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330, 360];
+        for(let n of notables) {
+            if(Math.abs(deg - n) < 2.5) { // Sensibilidad de 2.5 grados
+                ang = n * Math.PI / 180;
+                if("vibrate" in navigator && currentAngle !== ang) navigator.vibrate(5);
+                break;
+            }
+        }
+
+        currentAngle = ang;
         drawAll();
     }
 
@@ -309,6 +289,7 @@
     circleCanvas.addEventListener('touchstart', (e) => { isDragging = true; handle(e); });
     circleCanvas.addEventListener('touchmove', (e) => { isDragging && handle(e); e.preventDefault(); }, {passive: false});
 
+    renderPills();
     drawAll();
 </script>
 </body>
