@@ -20,9 +20,10 @@
             color: #333;
         }
 
+        /* Contenedor Gris Principal (Sin borde) */
         .container { 
             width: 100%; 
-            max-width: 1000px; 
+            max-width: 1100px; 
             background: #F2F2F2; 
             padding: 40px 20px; 
             border-radius: 50px; 
@@ -34,28 +35,30 @@
         .header h1 { font-family: 'Playfair Display', serif; font-size: 32px; margin: 0; }
         .header p { font-family: 'Playfair Display', serif; font-size: 18px; color: #666; margin-top: 5px; font-weight: 700; }
 
-        /* Selector de Píldoras (Switch de 3 opciones) */
+        /* Selector con mini-borde */
         .mode-selector {
             display: inline-flex;
-            background: #e0e0e0;
+            background: #eee;
             padding: 5px;
             border-radius: 30px;
             margin-bottom: 30px;
             gap: 5px;
+            border: 1px solid #ddd;
         }
 
         .pill {
             padding: 10px 20px;
             border-radius: 25px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             transition: 0.3s;
             color: #888;
             text-transform: uppercase;
+            border: 1px solid transparent;
         }
 
-        .pill.active { background: #000; color: #fff; }
+        .pill.active { border: 1px solid rgba(0,0,0,0.1); color: #fff; }
         .pill.active.sin { background: #FF2D55; }
         .pill.active.cos { background: #007AFF; }
         .pill.active.tan { background: #FF9500; }
@@ -67,18 +70,19 @@
             align-items: center;
         }
 
-        @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
+        /* Tarjetas con mini-borde */
         .canvas-card {
             background: white;
             border-radius: 35px;
-            padding: 20px;
+            padding: 25px;
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            border: 1px solid #ddd;
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow: hidden;
         }
 
         canvas { max-width: 100%; height: auto; z-index: 1; }
@@ -92,24 +96,27 @@
             pointer-events: none;
         }
 
+        /* Panel de Datos con mini-borde en items */
         .data-panel {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px;
             margin-top: 30px;
-            flex-wrap: wrap;
         }
 
         .data-item {
             background: white;
-            padding: 15px;
-            border-radius: 22px;
-            min-width: 120px;
-            flex: 1;
+            padding: 18px;
+            border-radius: 25px;
+            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .data-label { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
-        .data-value { font-size: 16px; font-weight: 700; color: #000; }
+        .data-value { font-size: 17px; font-weight: 700; color: #000; }
+        .data-sub { font-size: 13px; color: #888; font-weight: 600; margin-top: 3px; }
         
         .color-sin { color: #FF2D55; }
         .color-cos { color: #007AFF; }
@@ -132,10 +139,10 @@
 
     <div class="main-grid">
         <div class="canvas-card">
-            <div class="quadrant" style="top:20px; right:30px;">I</div>
-            <div class="quadrant" style="top:20px; left:30px;">II</div>
-            <div class="quadrant" style="bottom:20px; left:30px;">III</div>
-            <div class="quadrant" style="bottom:20px; right:30px;">IV</div>
+            <div class="quadrant" style="top:30px; right:40px;">I</div>
+            <div class="quadrant" style="top:30px; left:40px;">II</div>
+            <div class="quadrant" style="bottom:30px; left:40px;">III</div>
+            <div class="quadrant" style="bottom:30px; right:40px;">IV</div>
             <canvas id="circleCanvas" width="500" height="500"></canvas>
         </div>
 
@@ -146,15 +153,16 @@
 
     <div class="data-panel">
         <div class="data-item">
-            <div class="data-label">Ángulo</div>
+            <div class="data-label">Ángulo (θ)</div>
             <div class="data-value" id="val-angle">0.0°</div>
+            <div class="data-sub" id="val-rads">0.00 rad | 0.00π</div>
         </div>
         <div class="data-item">
-            <div class="data-label color-sin">Seno</div>
+            <div class="data-label color-sin">Seno (y)</div>
             <div class="data-value" id="val-sin">0.000</div>
         </div>
         <div class="data-item">
-            <div class="data-label color-cos">Coseno</div>
+            <div class="data-label color-cos">Coseno (x)</div>
             <div class="data-value" id="val-cos">1.000</div>
         </div>
         <div class="data-item">
@@ -191,119 +199,107 @@
         const cx = 250, cy = 250, r = 180;
         circleCtx.clearRect(0, 0, 500, 500);
 
-        // Guías de ángulos
-        circleCtx.strokeStyle = '#f0f0f0'; circleCtx.lineWidth = 1;
-        circleCtx.font = '600 11px "Open Sans"'; circleCtx.fillStyle = '#bbb'; circleCtx.textAlign = 'center';
-
+        // Guías de ángulos notables
+        circleCtx.font = '700 11px "Open Sans"'; circleCtx.fillStyle = '#bbb'; circleCtx.textAlign = 'center';
         [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330].forEach(deg => {
             const rad = deg * Math.PI / 180;
-            const tx = cx + (r + 30) * Math.cos(rad);
-            const ty = cy - (r + 30) * Math.sin(rad);
-            circleCtx.fillText(deg + '°', tx, ty + 4);
+            circleCtx.fillText(deg + '°', cx + (r + 30) * Math.cos(rad), cy - (r + 30) * Math.sin(rad) + 4);
         });
 
         // Ejes
-        circleCtx.strokeStyle = '#eee'; circleCtx.lineWidth = 2;
+        circleCtx.strokeStyle = '#f0f0f0'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.moveTo(0, cy); circleCtx.lineTo(500, cy); circleCtx.moveTo(cx, 0); circleCtx.lineTo(cx, 500); circleCtx.stroke();
 
-        // Círculo
+        // Círculo Principal
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 3;
         circleCtx.beginPath(); circleCtx.arc(cx, cy, r, 0, Math.PI * 2); circleCtx.stroke();
 
         const x = cx + r * Math.cos(currentAngle);
         const y = cy - r * Math.sin(currentAngle);
 
-        // --- Proyecciones ---
-        // Coseno (Azul)
+        // Seno (Rojo) y Coseno (Azul)
         circleCtx.strokeStyle = '#007AFF'; circleCtx.lineWidth = 5;
         circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke();
-
-        // Seno (Rojo)
         circleCtx.strokeStyle = '#FF2D55'; circleCtx.lineWidth = 5;
         circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
 
-        // Tangente (Naranja) - Se dibuja en la vertical x = r
-        const tanVal = Math.tan(currentAngle);
-        if (Math.abs(Math.cos(currentAngle)) > 0.01) {
+        // Tangente (Naranja)
+        if (Math.abs(Math.cos(currentAngle)) > 0.05) {
             circleCtx.strokeStyle = '#FF9500'; circleCtx.lineWidth = 5;
-            circleCtx.beginPath();
-            circleCtx.moveTo(cx + r, cy);
-            circleCtx.lineTo(cx + r, cy - r * tanVal);
-            circleCtx.stroke();
-            
-            // Línea de extensión del radio hacia la tangente
-            circleCtx.setLineDash([3, 3]);
-            circleCtx.strokeStyle = '#FF9500'; circleCtx.lineWidth = 1;
-            circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cx + r, cy - r * tanVal); circleCtx.stroke();
-            circleCtx.setLineDash([]);
+            circleCtx.beginPath(); circleCtx.moveTo(cx + r, cy); circleCtx.lineTo(cx + r, cy - r * Math.tan(currentAngle)); circleCtx.stroke();
         }
 
-        // Punto móvil
-        circleCtx.fillStyle = '#000';
-        circleCtx.beginPath(); circleCtx.arc(x, y, 10, 0, Math.PI * 2); circleCtx.fill();
+        // Punto
+        circleCtx.fillStyle = '#000'; circleCtx.beginPath(); circleCtx.arc(x, y, 10, 0, Math.PI * 2); circleCtx.fill();
         circleCtx.strokeStyle = '#fff'; circleCtx.lineWidth = 3; circleCtx.stroke();
     }
 
     function drawGraph() {
-        const w = 500, h = 500, midY = h / 2, amp = 150;
-        graphCtx.clearRect(0, 0, w, h);
+        const w = 500, h = 500, midY = h / 2, amp = 140;
+        graphCtx.clearRect(0, 0, 500, 500);
 
-        let color = '#FF2D55';
-        let func = Math.sin;
-        if(mode === 'cos') { color = '#007AFF'; func = Math.cos; }
-        if(mode === 'tan') { color = '#FF9500'; func = Math.tan; }
-
-        // Ejes
+        // Ejes y Etiquetas de Pi
         graphCtx.strokeStyle = '#eee'; graphCtx.lineWidth = 2;
         graphCtx.beginPath(); graphCtx.moveTo(50, 0); graphCtx.lineTo(50, h); graphCtx.moveTo(0, midY); graphCtx.lineTo(w, midY); graphCtx.stroke();
 
-        // Curva
+        graphCtx.fillStyle = '#aaa'; graphCtx.font = '700 12px "Open Sans"'; graphCtx.textAlign = 'center';
+        const labels = [
+            { x: 50, t: '0' },
+            { x: 150, t: 'π/2' },
+            { x: 250, t: 'π' },
+            { x: 350, t: '3π/2' },
+            { x: 450, t: '2π' }
+        ];
+        labels.forEach(l => {
+            graphCtx.fillText(l.t, l.x, midY + 25);
+            graphCtx.beginPath(); graphCtx.moveTo(l.x, midY-5); graphCtx.lineTo(l.x, midY+5); graphCtx.stroke();
+        });
+
+        // Valores en Y
+        graphCtx.textAlign = 'right';
+        graphCtx.fillText('1', 40, midY - amp + 5);
+        graphCtx.fillText('-1', 40, midY + amp + 5);
+
+        // Dibujo de Curva
+        let color = '#FF2D55'; let func = Math.sin;
+        if(mode === 'cos') { color = '#007AFF'; func = Math.cos; }
+        if(mode === 'tan') { color = '#FF9500'; func = Math.tan; }
+
         graphCtx.strokeStyle = color; graphCtx.lineWidth = 4;
         graphCtx.beginPath();
         for(let i = 0; i <= 400; i++) {
-            const ang = (i / 400) * Math.PI * 2;
-            const val = func(ang);
-            const py = midY - val * amp;
-
-            // Evitar líneas verticales infinitas en tangente
-            if (mode === 'tan' && Math.abs(val) > 10) {
-                graphCtx.stroke(); graphCtx.beginPath();
-            } else {
-                if(i === 0) graphCtx.moveTo(50 + i, py);
-                else graphCtx.lineTo(50 + i, py);
-            }
+            const a = (i / 400) * Math.PI * 2;
+            const v = func(a);
+            const py = midY - v * amp;
+            if (mode === 'tan' && Math.abs(v) > 8) { graphCtx.stroke(); graphCtx.beginPath(); }
+            else { if(i === 0) graphCtx.moveTo(50+i, py); else graphCtx.lineTo(50+i, py); }
         }
         graphCtx.stroke();
 
-        // Marcador sincronizado
-        let normAng = currentAngle % (Math.PI * 2);
-        if(normAng < 0) normAng += Math.PI * 2;
-        const markerX = 50 + (normAng / (Math.PI * 2)) * 400;
-        const markerY = midY - func(normAng) * amp;
-
-        if (mode !== 'tan' || Math.abs(func(normAng)) < 5) {
-            graphCtx.fillStyle = color; graphCtx.beginPath(); graphCtx.arc(markerX, markerY, 8, 0, Math.PI * 2); graphCtx.fill();
+        // Marcador
+        let norm = currentAngle % (Math.PI * 2); if(norm < 0) norm += Math.PI * 2;
+        const mx = 50 + (norm / (Math.PI * 2)) * 400;
+        const my = midY - func(norm) * amp;
+        if(mode !== 'tan' || Math.abs(func(norm)) < 8) {
+            graphCtx.fillStyle = color; graphCtx.beginPath(); graphCtx.arc(mx, my, 8, 0, Math.PI * 2); graphCtx.fill();
             graphCtx.strokeStyle = '#fff'; graphCtx.lineWidth = 2; graphCtx.stroke();
         }
     }
 
     function updateText() {
-        let ang = (currentAngle * 180 / Math.PI) % 360;
-        if(ang < 0) ang += 360;
-        document.getElementById('val-angle').innerText = ang.toFixed(1) + '°';
-        document.getElementById('val-sin').innerText = Math.sin(currentAngle).toFixed(3);
-        document.getElementById('val-cos').innerText = Math.cos(currentAngle).toFixed(3);
-        const t = Math.tan(currentAngle);
-        document.getElementById('val-tan').innerText = Math.abs(t) > 100 ? '∞' : t.toFixed(3);
+        let n = currentAngle % (Math.PI * 2); if(n < 0) n += Math.PI * 2;
+        document.getElementById('val-angle').innerText = (n * 180 / Math.PI).toFixed(1) + '°';
+        document.getElementById('val-rads').innerText = `${n.toFixed(2)} rad | ${(n / Math.PI).toFixed(2)}π`;
+        document.getElementById('val-sin').innerText = Math.sin(n).toFixed(3);
+        document.getElementById('val-cos').innerText = Math.cos(n).toFixed(3);
+        const t = Math.tan(n); document.getElementById('val-tan').innerText = Math.abs(t) > 50 ? '∞' : t.toFixed(3);
     }
 
     function handle(e) {
         const rect = circleCanvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        const x = (clientX - rect.left) * (500 / rect.width);
-        const y = (clientY - rect.top) * (500 / rect.height);
-        currentAngle = Math.atan2(250 - y, x - 250);
+        currentAngle = Math.atan2(250 - (clientY - rect.top) * (500 / rect.height), (clientX - rect.left) * (500 / rect.width) - 250);
         drawAll();
     }
 
@@ -315,6 +311,5 @@
 
     drawAll();
 </script>
-
 </body>
 </html>
