@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Círculo Unitario Pro Mobile</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Open+Sans:wght@400;600;700&display=swap');
+
+        /* Reset para evitar scroll accidental en móvil */
+        * { touch-action: manipulation; box-sizing: border-box; }
+        
+        body { 
+            background: #fff; 
+            margin: 0; 
+            padding: 10px; 
+            font-family: 'Open Sans', sans-serif; 
+            display: flex; 
+            justify-content: center;
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 500px; /* Tamaño ideal para móvil */
+            background: #F2F2F2; 
+            padding: 25px 15px; 
+            border-radius: 40px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        }
+
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 26px; margin: 0; }
+        .header p { font-family: 'Playfair Display', serif; font-size: 14px; color: #666; margin-top: 5px; }
+
+        /* Contenedor del Canvas Responsivo */
+        #canvas-container {
+            background: white;
+            border-radius: 30px;
+            margin-top: 20px;
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Mantiene el cuadrado perfecto */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none; /* Bloquea el scroll mientras arrastras el punto */
+        }
+
+        canvas { width: 90%; height: 90%; }
+
+        /* Panel de Datos optimizado para lectura rápida */
+        .data-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .data-item {
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            text-align: left;
+        }
+
+        .full-width { grid-column: 1 / -1; }
+
+        .data-label { font-size: 10px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        .data-value { font-size: 18px; font-weight: 600; color: #000; margin-top: 3px; }
+
+        .color-cos { color: #007AFF; }
+        .color-sin { color: #FF2D55; }
+
+        .hint { font-size: 12px; color: #aaa; margin-top: 15px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Círculo Unitario</h1>
+        <p>Toca y arrastra para explorar</p>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="unitCircle" width="600" height="600"></canvas>
+    </div>
+
+    <div class="data-panel">
+        <div class="data-item full-width">
+            <div class="data-label">Ángulo</div>
+            <div class="data-value" id="val-angle">0° | 0 rad</div>
+            <div id="val-pi" style="font-size: 14px; color: #888; font-weight: 600;">0π rad</div>
+        </div>
+
+        <div class="data-item">
+            <div class="data-label color-cos">Cos (x)</div>
+            <div class="data-value" id="val-cos">1.000</div>
+        </div>
+
+        <div class="data-item">
+            <div class="data-label color-sin">Sen (y)</div>
+            <div class="data-value" id="val-sin">0.000</div>
+        </div>
+    </div>
+
+    <div class="hint">Optimizado para gestos táctiles</div>
+</div>
+
+<script>
+    const canvas = document.getElementById('unitCircle');
+    const ctx = canvas.getContext('2d');
+    const centerX = 300;
+    const centerY = 300;
+    const radius = 240;
+
+    let isDragging = false;
+    let currentAngle = 0;
+
+    function draw() {
+        ctx.clearRect(0, 0, 600, 600);
+
+        // Ejes
+        ctx.strokeStyle = '#eee';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, centerY); ctx.lineTo(600, centerY);
+        ctx.moveTo(centerX, 0); ctx.lineTo(centerX, 600);
+        ctx.stroke();
+
+        // Círculo
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        const x = centerX + radius * Math.cos(currentAngle);
+        const y = centerY - radius * Math.sin(currentAngle);
+
+        // Líneas Trigonométricas
+        ctx.setLineDash([10, 10]);
+        ctx.strokeStyle = '#ccc';
+        ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.lineTo(x, y); ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Coseno (X)
+        ctx.strokeStyle = '#007AFF'; ctx.lineWidth = 8;
+        ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.lineTo(x, centerY); ctx.stroke();
+
+        // Seno (Y)
+        ctx.strokeStyle = '#FF2D55'; ctx.lineWidth = 8;
+        ctx.beginPath(); ctx.moveTo(x, centerY); ctx.lineTo(x, y); ctx.stroke();
+
+        // Punto principal
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.arc(x, y, 15, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.stroke();
+
+        updateData(currentAngle);
+    }
+
+    function updateData(rad) {
+        let n = rad % (Math.PI * 2);
+        if (n < 0) n += Math.PI * 2;
+        
+        document.getElementById('val-angle').innerText = `${(n * 180 / Math.PI).toFixed(1)}° | ${n.toFixed(2)} rad`;
+        document.getElementById('val-pi').innerText = `${(n / Math.PI).toFixed(2)}π rad`;
+        document.getElementById('val-cos').innerText = Math.cos(n).toFixed(3);
+        document.getElementById('val-sin').innerText = Math.sin(n).toFixed(3);
+    }
+
+    function handle(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const x = (clientX - rect.left) * (600 / rect.width);
+        const y = (clientY - rect.top) * (600 / rect.height);
+        currentAngle = Math.atan2(centerY - y, x - centerX);
+        draw();
+    }
+
+    // Eventos Mouse y Touch
+    canvas.addEventListener('mousedown', () => isDragging = true);
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', (e) => isDragging && handle(e));
+    canvas.addEventListener('touchstart', (e) => { isDragging = true; handle(e); });
+    canvas.addEventListener('touchmove', (e) => { isDragging && handle(e); e.preventDefault(); }, {passive: false});
+    canvas.addEventListener('touchend', () => isDragging = false);
+
+    draw();
+</script>
+</body>
+</html>
