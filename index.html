@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trigonometría Master Completa</title>
+    <title>Trigonometría Master Pro - Color Fix</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans:wght@400;600;700&display=swap');
@@ -24,7 +24,6 @@
         .header h1 { font-family: 'Playfair Display', serif; font-size: 32px; margin: 0; }
         .header p { font-family: 'Playfair Display', serif; font-size: 18px; color: #666; margin-top: 5px; font-weight: 700; }
 
-        /* Barra de Navegación de Gráficas (Siempre las 6) */
         .mode-selector {
             display: inline-flex; flex-wrap: wrap; justify-content: center; background: #eee; padding: 5px; border-radius: 30px; 
             margin-bottom: 25px; gap: 5px; border: 1px solid #ddd;
@@ -35,14 +34,14 @@
         }
         .pill.active { border: 1px solid rgba(0,0,0,0.1); color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
-        /* Colores de Funciones */
-        .sin.active, .color-sin { background-color: #FF2D55; color: #FF2D55; }
-        .cos.active, .color-cos { background-color: #007AFF; color: #007AFF; }
-        .tan.active, .color-tan { background-color: #FF9500; color: #FF9500; }
-        .csc.active, .color-csc { background-color: #AF52DE; color: #AF52DE; }
-        .sec.active, .color-sec { background-color: #5856D6; color: #5856D6; }
-        .cot.active, .color-cot { background-color: #5AC8FA; color: #5AC8FA; }
-        .pill.active { color: #fff !important; } /* Forzar texto blanco en pills activas */
+        /* PALETA DE COLORES ACTUALIZADA */
+        .sin.active, .color-sin { background-color: #FF2D55; color: #FF2D55; } /* Rojo */
+        .cos.active, .color-cos { background-color: #007AFF; color: #007AFF; } /* Azul */
+        .tan.active, .color-tan { background-color: #FF9500; color: #FF9500; } /* Naranja */
+        .csc.active, .color-csc { background-color: #28CD41; color: #28CD41; } /* VERDE ESMERALDA (NUEVO) */
+        .sec.active, .color-sec { background-color: #5856D6; color: #5856D6; } /* Índigo */
+        .cot.active, .color-cot { background-color: #5AC8FA; color: #5AC8FA; } /* Cian */
+        .pill.active { color: #fff !important; }
 
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
         @media (max-width: 950px) { .main-grid { grid-template-columns: 1fr; } }
@@ -63,7 +62,6 @@
         }
         .data-label { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
         .data-value { font-size: 16px; font-weight: 700; color: #000; }
-        /* Color Gris Oscuro para valores exactos */
         .data-exact { font-size: 14px; color: #555; font-weight: 600; margin-top: 4px; }
     </style>
 </head>
@@ -71,12 +69,11 @@
 
 <div class="container">
     <div class="header">
-        <h1>Círculo Unitario Completo</h1>
+        <h1>Círculo Unitario Pro</h1>
         <p>√(Raíz) Cuadrada²</p>
     </div>
 
-    <div class="mode-selector" id="pills-container">
-        </div>
+    <div class="mode-selector" id="pills-container"></div>
 
     <div class="main-grid">
         <div class="canvas-card">
@@ -113,7 +110,6 @@
     let mode = 'sin';
     const allFuncs = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot'];
 
-    // Valores Exactos
     const exactValues = {
         0:   { sin:'0', cos:'1', tan:'0', csc:'∞', sec:'1', cot:'∞' },
         30:  { sin:'1/2', cos:'√3/2', tan:'√3/3', csc:'2', sec:'2√3/3', cot:'√3' },
@@ -146,7 +142,6 @@
         const cx = 250, cy = 250, r = 160;
         circleCtx.clearRect(0, 0, 500, 500);
 
-        // Ejes y Etiquetas de Valor
         circleCtx.strokeStyle = '#f0f0f0'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.moveTo(0, cy); circleCtx.lineTo(500, cy); circleCtx.moveTo(cx, 0); circleCtx.lineTo(cx, 500); circleCtx.stroke();
         
@@ -155,14 +150,6 @@
         circleCtx.textAlign = 'right'; circleCtx.fillText('-1', cx - r - 5, cy + 4);
         circleCtx.textAlign = 'center'; circleCtx.fillText('1', cx, cy - r - 5); circleCtx.fillText('-1', cx, cy + r + 15);
 
-        // Guías de ángulos
-        circleCtx.font = '600 10px "Open Sans"'; circleCtx.fillStyle = '#ccc';
-        [30, 45, 60, 120, 135, 150, 210, 225, 240, 300, 315, 330].forEach(deg => {
-            const rad = deg * Math.PI / 180;
-            circleCtx.fillText(deg + '°', cx + (r + 20) * Math.cos(rad), cy - (r + 20) * Math.sin(rad) + 4);
-        });
-
-        // Círculo Base
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.arc(cx, cy, r, 0, Math.PI * 2); circleCtx.stroke();
 
@@ -171,60 +158,36 @@
         const sinVal = Math.sin(currentAngle);
         const cosVal = Math.cos(currentAngle);
 
-        // --- PROYECCIONES GEOMÉTRICAS ---
-        
-        // 1. Seno (Rojo) y Coseno (Azul) - Los más gruesos
+        // --- DIBUJO ---
         circleCtx.lineWidth = 4;
         circleCtx.strokeStyle = '#007AFF'; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke(); // Cos
         circleCtx.strokeStyle = '#FF2D55'; circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke(); // Sin
         
-        // Radio
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
         circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
 
-        // Evitar división por cero y valores extremos para las recíprocas
         if (Math.abs(sinVal) > 0.01 && Math.abs(cosVal) > 0.01) {
             const tanVal = Math.tan(currentAngle);
             const cotVal = 1 / tanVal;
             const secVal = 1 / cosVal;
             const cscVal = 1 / sinVal;
 
-            // Puntos de intersección
             const tanX = cx + r, tanY = cy - r * tanVal;
             const cotX = cx + r * cotVal, cotY = cy - r * (sinVal>=0?1:-1);
             const secX = cx + r * secVal;
             const cscY = cy - r * cscVal;
 
             circleCtx.lineWidth = 3;
+            circleCtx.strokeStyle = '#FF9500'; circleCtx.beginPath(); circleCtx.moveTo(tanX, cy); circleCtx.lineTo(tanX, tanY); circleCtx.stroke(); // Tan
+            circleCtx.strokeStyle = '#5AC8FA'; circleCtx.beginPath(); circleCtx.moveTo(cx, cotY); circleCtx.lineTo(cotX, cotY); circleCtx.stroke(); // Cot
+            circleCtx.strokeStyle = '#5856D6'; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(secX, cy); circleCtx.stroke(); // Sec
+            circleCtx.strokeStyle = '#28CD41'; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cx, cscY); circleCtx.stroke(); // Csc (VERDE)
 
-            // Tangente (Naranja)
-            circleCtx.strokeStyle = '#FF9500'; circleCtx.beginPath(); circleCtx.moveTo(tanX, cy); circleCtx.lineTo(tanX, tanY); circleCtx.stroke();
-
-            // Cotangente (Cian)
-            circleCtx.strokeStyle = '#5AC8FA'; circleCtx.beginPath(); circleCtx.moveTo(cx, cotY); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
-
-            // Secante (Índigo) - En el eje X
-            circleCtx.strokeStyle = '#5856D6'; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(secX, cy); circleCtx.stroke();
-
-            // Cosecante (Púrpura) - En el eje Y
-            circleCtx.strokeStyle = '#AF52DE'; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
-
-            // Líneas Punteadas de Proyección (Conectan origen con las nuevas funciones)
             circleCtx.setLineDash([3, 4]); circleCtx.lineWidth = 1; circleCtx.strokeStyle = '#aaa';
-            circleCtx.beginPath();
-            // Extensión del radio hacia Tan/Sec/Csc
-            circleCtx.moveTo(x,y); circleCtx.lineTo(secX, cscY);
-            // Extensión hacia Cot
-            circleCtx.moveTo(cx,cy); circleCtx.lineTo(cotX, cotY);
-            circleCtx.stroke();
+            circleCtx.beginPath(); circleCtx.moveTo(x,y); circleCtx.lineTo(secX, cscY); circleCtx.moveTo(cx,cy); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
             circleCtx.setLineDash([]);
-            
-            // Línea tangente completa que une Sec y Csc
-            circleCtx.lineWidth = 1; circleCtx.strokeStyle = '#ccc';
-            circleCtx.beginPath(); circleCtx.moveTo(secX, cy); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
         }
 
-        // Punto
         circleCtx.fillStyle = '#fff'; circleCtx.beginPath(); circleCtx.arc(x, y, 8, 0, Math.PI * 2); circleCtx.fill();
         circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 3; circleCtx.stroke();
     }
@@ -233,31 +196,20 @@
         const w = 500, h = 500, midY = h / 2, amp = 120;
         graphCtx.clearRect(0, 0, 500, 500);
 
-        const colors = { sin:'#FF2D55', cos:'#007AFF', tan:'#FF9500', csc:'#AF52DE', sec:'#5856D6', cot:'#5AC8FA' };
+        // COLORES EN GRÁFICA ACTUALIZADOS
+        const colors = { sin:'#FF2D55', cos:'#007AFF', tan:'#FF9500', csc:'#28CD41', sec:'#5856D6', cot:'#5AC8FA' };
         const funcs = { sin: Math.sin, cos: Math.cos, tan: Math.tan, csc: a => 1/Math.sin(a), sec: a => 1/Math.cos(a), cot: a => 1/Math.tan(a) };
 
-        // Ejes y Etiquetas
         graphCtx.strokeStyle = '#eee'; graphCtx.lineWidth = 2;
         graphCtx.beginPath(); graphCtx.moveTo(50, 0); graphCtx.lineTo(50, h); graphCtx.moveTo(0, midY); graphCtx.lineTo(w, midY); graphCtx.stroke();
 
-        graphCtx.fillStyle = '#999'; graphCtx.font = '700 11px "Open Sans"';
-        graphCtx.textAlign = 'right'; graphCtx.fillText('1', 45, midY - amp + 4); graphCtx.fillText('-1', 45, midY + amp + 4);
-        graphCtx.textAlign = 'center';
-        [{x:50,t:'0'},{x:150,t:'π/2'},{x:250,t:'π'},{x:350,t:'3π/2'},{x:450,t:'2π'}].forEach(l => {
-            graphCtx.fillText(l.t, l.x, midY + 20);
-            graphCtx.beginPath(); graphCtx.moveTo(l.x, midY-3); graphCtx.lineTo(l.x, midY+3); graphCtx.stroke();
-        });
-
-        // Curva
         graphCtx.strokeStyle = colors[mode]; graphCtx.lineWidth = 3;
         graphCtx.beginPath();
         for(let i = 0; i <= 400; i++) {
             const a = (i / 400) * Math.PI * 2;
             let v = funcs[mode](a);
-            // Limitar valores extremos para Tan, Csc, Sec, Cot
             if(Math.abs(v) > 15) v = v > 0 ? 15 : -15; 
             const py = midY - v * amp;
-
             if (['tan','csc','sec','cot'].includes(mode) && Math.abs(funcs[mode](a)) > 10 && i > 0) { 
                 graphCtx.stroke(); graphCtx.beginPath(); 
             } else {
@@ -266,7 +218,6 @@
         }
         graphCtx.stroke();
 
-        // Marcador
         let norm = currentAngle % (Math.PI * 2); if(norm < 0) norm += Math.PI * 2;
         let vMark = funcs[mode](norm);
         if(Math.abs(vMark) < 10) {
@@ -280,24 +231,14 @@
     function updateText() {
         let n = currentAngle % (Math.PI * 2); if(n < 0) n += Math.PI * 2;
         let deg = Math.round(n * 180 / Math.PI);
-        
         document.getElementById('val-angle').innerText = (n * 180 / Math.PI).toFixed(1) + '°';
         document.getElementById('exact-angle').innerText = (n / Math.PI).toFixed(2) + 'π rad';
-        
-        const vals = {
-            sin: Math.sin(n), cos: Math.cos(n), tan: Math.tan(n),
-            csc: 1/Math.sin(n), sec: 1/Math.cos(n), cot: 1/Math.tan(n)
-        };
-
+        const vals = { sin: Math.sin(n), cos: Math.cos(n), tan: Math.tan(n), csc: 1/Math.sin(n), sec: 1/Math.cos(n), cot: 1/Math.tan(n) };
         allFuncs.forEach(f => {
-            const valStr = Math.abs(vals[f]) > 50 ? '∞' : vals[f].toFixed(3);
-            document.getElementById(`val-${f}`).innerText = valStr;
+            document.getElementById(`val-${f}`).innerText = Math.abs(vals[f]) > 50 ? '∞' : vals[f].toFixed(3);
         });
-
         const ex = exactValues[deg % 360] || exactValues[360 - (deg % 360)];
-        allFuncs.forEach(f => {
-            document.getElementById(`exact-${f}`).innerText = ex ? ex[f] : '';
-        });
+        allFuncs.forEach(f => { document.getElementById(`exact-${f}`).innerText = ex ? ex[f] : ''; });
     }
 
     function handle(e) {
@@ -308,8 +249,6 @@
         let y = 250 - (clientY - rect.top) * (500 / rect.height);
         let ang = Math.atan2(y, x);
         let deg = ang * 180 / Math.PI; if(deg < 0) deg += 360;
-
-        // Snap magnético
         const notables = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330, 360];
         for(let n of notables) {
             if(Math.abs(deg - n) < 2.5) {
