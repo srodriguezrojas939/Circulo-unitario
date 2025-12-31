@@ -25,29 +25,25 @@
         .header p { font-family: 'Playfair Display', serif; font-size: 18px; color: #666; margin-top: 5px; font-weight: 700; }
 
         .mode-selector {
-            display: inline-flex; flex-wrap: wrap; justify-content: center; background: #eee; padding: 5px; border-radius: 30px; 
-            margin-bottom: 25px; gap: 5px; border: 1px solid #ddd;
+            display: inline-flex; flex-wrap: wrap; justify-content: center; background: #eee; padding: 10px; border-radius: 30px; 
+            margin-bottom: 25px; gap: 10px; border: 1px solid #ddd; align-items: center;
         }
+
+        /* Estética del selector de color inspirada en la imagen */
+        .color-wrapper {
+            display: flex; align-items: center; gap: 5px; background: white; padding: 4px 10px; border-radius: 20px; border: 1px solid #ddd;
+        }
+        .color-input-custom {
+            -webkit-appearance: none; border: none; width: 18px; height: 18px; cursor: pointer; border-radius: 3px; background: none; padding: 0;
+        }
+        .color-input-custom::-webkit-color-swatch { border: none; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0,0,0,0.1); }
+
         .pill {
-            padding: 10px 16px; border-radius: 25px; cursor: pointer; font-size: 11px;
+            padding: 8px 12px; border-radius: 25px; cursor: pointer; font-size: 11px;
             font-weight: 700; transition: 0.3s; color: #888; text-transform: uppercase; border: 1px solid transparent;
         }
-        .pill.active { border: 1px solid rgba(0,0,0,0.1); color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .pill.active { border: 1px solid rgba(0,0,0,0.1); color: #fff !important; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
-        /* COLORES Y TARJETAS */
-        .sin.active, .item-sin { background-color: #FF2D55; } 
-        .cos.active, .item-cos { background-color: #007AFF; } 
-        .tan.active, .item-tan { background-color: #FF9500; } 
-        .csc.active, .item-csc { background-color: #28CD41; } 
-        .sec.active, .item-sec { background-color: #fcdcf0; } /* Color Secante Solicitado */
-        .cot.active, .item-cot { background-color: #5AC8FA; } 
-        
-        /* Ajuste de texto para Secante (color claro) */
-        .item-sec { color: #555 !important; }
-        .item-sec .data-label, .item-sec .data-value, .item-sec .data-exact { color: #333 !important; }
-
-        .pill.active { color: #fff !important; }
-
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
         @media (max-width: 950px) { .main-grid { grid-template-columns: 1fr; } }
 
@@ -65,16 +61,20 @@
             padding: 15px; border-radius: 22px;
             display: flex; flex-direction: column; justify-content: center; min-height: 100px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            color: white;
+            background: white; border: 1px solid #ddd;
         }
-        .item-angle { background: white; border: 1px solid #ddd; color: #333; }
-        .item-angle .data-label { color: #aaa; }
-        .item-angle .data-value { color: #000; }
-        .item-angle .data-exact { color: #555; }
 
-        .data-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.9); text-transform: uppercase; margin-bottom: 5px; }
+        .data-label { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
         .data-value { font-size: 20px; font-weight: 700; }
-        .data-exact { font-size: 15px; font-weight: 600; margin-top: 4px; color: rgba(255,255,255,0.85); }
+        .data-exact { font-size: 15px; font-weight: 600; margin-top: 4px; }
+
+        /* Estilo del botón de descarga */
+        .download-btn {
+            margin-top: 30px; padding: 15px 30px; border-radius: 30px; border: none;
+            background: #333; color: white; font-weight: 700; cursor: pointer;
+            font-family: 'Open Sans', sans-serif; transition: 0.3s;
+        }
+        .download-btn:hover { background: #000; transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -97,18 +97,20 @@
     </div>
 
     <div class="data-panel">
-        <div class="data-item item-angle">
-            <div class="data-label">Ángulo</div>
-            <div class="data-value" id="val-angle">0.0°</div>
-            <div class="data-exact" id="exact-angle">0 rad</div>
+        <div class="data-item" id="card-angle">
+            <div class="data-label" style="color: #aaa;">Ángulo</div>
+            <div class="data-value" id="val-angle" style="color: #000;">0.0°</div>
+            <div class="data-exact" id="exact-angle" style="color: #555;">0 rad</div>
         </div>
-        <div class="data-item item-sin"><div class="data-label">Seno</div><div class="data-value" id="val-sin">0.000</div><div class="data-exact" id="exact-sin"></div></div>
-        <div class="data-item item-cos"><div class="data-label">Coseno</div><div class="data-value" id="val-cos">1.000</div><div class="data-exact" id="exact-cos"></div></div>
-        <div class="data-item item-tan"><div class="data-label">Tangente</div><div class="data-value" id="val-tan">0.000</div><div class="data-exact" id="exact-tan"></div></div>
-        <div class="data-item item-csc"><div class="data-label">Cosecante</div><div class="data-value" id="val-csc">∞</div><div class="data-exact" id="exact-csc"></div></div>
-        <div class="data-item item-sec"><div class="data-label">Secante</div><div class="data-value" id="val-sec">1.000</div><div class="data-exact" id="exact-sec"></div></div>
-        <div class="data-item item-cot"><div class="data-label">Cotangente</div><div class="data-value" id="val-cot">∞</div><div class="data-exact" id="exact-cot"></div></div>
+        <div class="data-item" id="card-sin"><div class="data-label">Seno</div><div class="data-value" id="val-sin">0.000</div><div class="data-exact" id="exact-sin"></div></div>
+        <div class="data-item" id="card-cos"><div class="data-label">Coseno</div><div class="data-value" id="val-cos">1.000</div><div class="data-exact" id="exact-cos"></div></div>
+        <div class="data-item" id="card-tan"><div class="data-label">Tangente</div><div class="data-value" id="val-tan">0.000</div><div class="data-exact" id="exact-tan"></div></div>
+        <div class="data-item" id="card-csc"><div class="data-label">Cosecante</div><div class="data-value" id="val-csc">∞</div><div class="data-exact" id="exact-csc"></div></div>
+        <div class="data-item" id="card-sec"><div class="data-label">Secante</div><div class="data-value" id="val-sec">1.000</div><div class="data-exact" id="exact-sec"></div></div>
+        <div class="data-item" id="card-cot"><div class="data-label">Cotangente</div><div class="data-value" id="val-cot">∞</div><div class="data-exact" id="exact-cot"></div></div>
     </div>
+
+    <button class="download-btn" onclick="downloadAll()">Descargar en PNG</button>
 </div>
 
 <script>
@@ -121,7 +123,12 @@
     let isDragging = false;
     let mode = 'sin';
     const allFuncs = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot'];
-    const colors = { sin:'#FF2D55', cos:'#007AFF', tan:'#FF9500', csc:'#28CD41', sec:'#fcdcf0', cot:'#5AC8FA' };
+    
+    // Colores iniciales
+    const colors = { 
+        sin:'#FF2D55', cos:'#007AFF', tan:'#FF9500', 
+        csc:'#28CD41', sec:'#FF69B4', cot:'#5AC8FA' 
+    };
 
     const exactValues = {
         0:   { sin:'0', cos:'1', tan:'0', csc:'∞', sec:'1', cot:'∞' },
@@ -137,11 +144,29 @@
         const container = document.getElementById('pills-container');
         container.innerHTML = '';
         allFuncs.forEach(f => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'color-wrapper';
+            
+            // Selector de color (Estética imagen)
+            const colorInp = document.createElement('input');
+            colorInp.type = 'color';
+            colorInp.className = 'color-input-custom';
+            colorInp.value = colors[f];
+            colorInp.oninput = (e) => {
+                colors[f] = e.target.value;
+                drawAll();
+                renderPills();
+            };
+
             const p = document.createElement('div');
-            p.className = `pill ${f} ${mode === f ? 'active' : ''}`;
+            p.className = `pill ${mode === f ? 'active' : ''}`;
+            if(mode === f) p.style.backgroundColor = colors[f];
             p.innerText = f.toUpperCase();
             p.onclick = () => { mode = f; renderPills(); drawAll(); };
-            container.appendChild(p);
+            
+            wrapper.appendChild(colorInp);
+            wrapper.appendChild(p);
+            container.appendChild(wrapper);
         });
     }
 
@@ -160,7 +185,6 @@
         circleCtx.textAlign = 'right'; circleCtx.fillText('-1', cx - r - 5, cy + 4);
         circleCtx.textAlign = 'center'; circleCtx.fillText('1', cx, cy - r - 5); circleCtx.fillText('-1', cx, cy + r + 15);
 
-        // --- ADICIÓN: GRADOS EN EL CÍRCULO ---
         const notablesDeg = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330];
         notablesDeg.forEach(deg => {
             const rad = deg * Math.PI / 180;
@@ -223,14 +247,7 @@
         graphCtx.fillStyle = '#999'; graphCtx.font = '700 11px "Open Sans"';
         graphCtx.textAlign = 'right'; graphCtx.fillText('1', 45, midY - amp + 4); graphCtx.fillText('-1', 45, midY + amp + 4);
         
-        // --- ADICIÓN: VALORES DE PI EN LA GRÁFICA ---
-        const labelsPi = [
-            { x: 50,  t: '0' },
-            { x: 150, t: 'π/2' },
-            { x: 250, t: 'π' },
-            { x: 350, t: '3π/2' },
-            { x: 450, t: '2π' }
-        ];
+        const labelsPi = [{ x: 50, t: '0' }, { x: 150, t: 'π/2' }, { x: 250, t: 'π' }, { x: 350, t: '3π/2' }, { x: 450, t: '2π' }];
         graphCtx.textAlign = 'center';
         labelsPi.forEach(l => {
             graphCtx.fillText(l.t, l.x, midY + 25);
@@ -263,12 +280,54 @@
         let deg = Math.round(n * 180 / Math.PI);
         document.getElementById('val-angle').innerText = (n * 180 / Math.PI).toFixed(1) + '°';
         document.getElementById('exact-angle').innerText = (n / Math.PI).toFixed(2) + 'π rad';
+        
         const vs = { sin: Math.sin(n), cos: Math.cos(n), tan: Math.tan(n), csc: 1/Math.sin(n), sec: 1/Math.cos(n), cot: 1/Math.tan(n) };
+        
         allFuncs.forEach(f => {
-            document.getElementById(`val-${f}`).innerText = Math.abs(vs[f]) > 50 ? '∞' : vs[f].toFixed(3);
+            const card = document.getElementById(`card-${f}`);
+            const valEl = document.getElementById(`val-${f}`);
+            const exEl = document.getElementById(`exact-${f}`);
+            const labelEl = card.querySelector('.data-label');
+
+            labelEl.style.color = colors[f];
+            valEl.style.color = colors[f];
+            exEl.style.color = colors[f];
+            exEl.style.opacity = "0.8";
+
+            valEl.innerText = Math.abs(vs[f]) > 50 ? '∞' : vs[f].toFixed(3);
             const ex = exactValues[deg % 360] || exactValues[360 - (deg % 360)];
-            document.getElementById(`exact-${f}`).innerText = ex ? ex[f] : '';
+            exEl.innerText = ex ? ex[f] : '';
         });
+    }
+
+    function downloadAll() {
+        const timestamp = new Date().getTime();
+        saveCanvas(circleCanvas, `Circulo_Unitario_${timestamp}.png`);
+        saveCanvas(graphCanvas, `Grafica_${mode.toUpperCase()}_${timestamp}.png`);
+    }
+
+    function saveCanvas(canvas, filename) {
+        // Crear canvas temporal para añadir marca de agua
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const ctx = tempCanvas.getContext('2d');
+
+        // Dibujar original
+        ctx.fillStyle = "white";
+        ctx.fillRect(0,0,tempCanvas.width, tempCanvas.height);
+        ctx.drawImage(canvas, 0, 0);
+
+        // Marca de agua
+        ctx.font = "bold 16px 'Playfair Display'";
+        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.textAlign = "right";
+        ctx.fillText("√(Raiz) Cuadrada²", tempCanvas.width - 20, tempCanvas.height - 20);
+
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = tempCanvas.toDataURL('image/png', 1.0);
+        link.click();
     }
 
     function handle(e) {
