@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Circulo unitario</title>
@@ -70,11 +71,54 @@
 
         /* Estilo del botón de descarga */
         .download-btn {
-            margin-top: 30px; padding: 15px 30px; border-radius: 30px; border: none;
-            background: #333; color: white; font-weight: 700; cursor: pointer;
-            font-family: 'Open Sans', sans-serif; transition: 0.3s;
-        }
-        .download-btn:hover { background: #000; transform: translateY(-2px); }
+    margin-top: 30px; 
+    padding: 12px 25px; 
+    border-radius: 30px; 
+    border: 1px solid #ddd;
+    background: #ffffff; 
+    color: #333; 
+    font-weight: 700; 
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif; 
+    transition: 0.3s;
+    display: inline-flex; /* Para alinear icono y texto */
+    align-items: center;
+    gap: 8px; /* Espacio entre icono y texto */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.download-btn:hover { 
+    background: #f9f9f9; 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+        
+      /* Píldora gris que agrupa los controles */
+.controls-group {
+    display: flex; align-items: center; background: #eee; 
+    padding: 4px; border-radius: 25px; gap: 5px; border: 1px solid #ddd;
+}
+
+/* Sub-píldora blanca para el botón de play y el input */
+.control-item {
+    display: flex; align-items: center; background: white; 
+    padding: 4px 10px; border-radius: 20px; border: 1px solid #ddd;
+    cursor: pointer; transition: 0.3s; color: #888; /* Iconos grises */
+}
+
+.control-item:hover { background: #fdfdfd; color: #333; }
+
+.angle-input {
+    border: none; outline: none; width: 45px; font-family: 'Open Sans';
+    font-weight: 700; font-size: 11px; text-align: center; color: #333;
+    background: transparent;
+}
+
+/* Quitar flechas del input */
+.angle-input::-webkit-inner-spin-button, .angle-input::-webkit-outer-spin-button {
+    -webkit-appearance: none; margin: 0;
+}
+
     </style>
 </head>
 <body>
@@ -110,7 +154,10 @@
         <div class="data-item" id="card-cot"><div class="data-label">Cotangente</div><div class="data-value" id="val-cot">∞</div><div class="data-exact" id="exact-cot"></div></div>
     </div>
 
-    <button class="download-btn" onclick="downloadAll()">Descargar en PNG</button>
+    <button class="download-btn" onclick="downloadAll()">
+    <i data-lucide="download" size="18"></i>
+    Descargar  PNG
+</button>
 </div>
 
 <script>
@@ -345,6 +392,110 @@
         currentAngle = ang; drawAll();
     }
 
+let isPlaying = false;
+let animationId = null;
+
+function renderPills() {
+    const container = document.getElementById('pills-container');
+    container.innerHTML = '';
+
+    // --- 1. GRUPO DE CONTROLES (Píldora Gris unificada) ---
+    const controlsGroup = document.createElement('div');
+    controlsGroup.className = 'controls-group';
+
+    // Sub-píldora: Botón Play/Pause (Icono gris)
+    const playBtn = document.createElement('div');
+    playBtn.className = 'control-item';
+    playBtn.innerHTML = isPlaying 
+        ? `<i data-lucide="pause" size="14"></i>` 
+        : `<i data-lucide="play" size="14"></i>`;
+    playBtn.onclick = togglePlay;
+    controlsGroup.appendChild(playBtn);
+
+    // Sub-píldora: Input de Ángulo con Brújula
+    const inputWrapper = document.createElement('div');
+    inputWrapper.className = 'control-item';
+    inputWrapper.style.cursor = 'default';
+    inputWrapper.innerHTML = `
+        <i data-lucide="drafting-compass" size="14" style="margin-right:5px;"></i>
+        <input type="number" class="angle-input" id="manual-angle" placeholder="0°" 
+               oninput="setManualAngle(this.value)">
+    `;
+    controlsGroup.appendChild(inputWrapper);
+    
+    // Añadimos el grupo gris al contenedor principal
+    container.appendChild(controlsGroup);
+
+    // --- 2. FUNCIONES TRIGONOMÉTRICAS (Tus píldoras de colores) ---
+    allFuncs.forEach(f => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'color-wrapper';
+        
+        const colorInp = document.createElement('input');
+        colorInp.type = 'color';
+        colorInp.className = 'color-input-custom';
+        colorInp.value = colors[f];
+        colorInp.oninput = (e) => {
+            colors[f] = e.target.value;
+            drawAll();
+            renderPills();
+        };
+
+        const p = document.createElement('div');
+        p.className = `pill ${mode === f ? 'active' : ''}`;
+        if(mode === f) p.style.backgroundColor = colors[f];
+        p.innerText = f.toUpperCase();
+        p.onclick = () => { mode = f; renderPills(); drawAll(); };
+        
+        wrapper.appendChild(colorInp);
+        wrapper.appendChild(p);
+        container.appendChild(wrapper);
+    });
+
+    // Inicializar iconos de Lucide para que se rendericen los nuevos cambios
+    lucide.createIcons();
+}
+
+// Lógica de Animación
+function togglePlay() {
+    isPlaying = !isPlaying;
+    if (isPlaying) animate();
+    else cancelAnimationFrame(animationId);
+    renderPills(); // Para actualizar el icono de play/pause
+}
+
+function animate() {
+    currentAngle += 0.015;
+    drawAll();
+    animationId = requestAnimationFrame(animate);
+}
+
+// Lógica de Input Manual
+function setManualAngle(val) {
+    if (val === "" || isNaN(val)) return;
+    currentAngle = (parseFloat(val) * Math.PI / 180);
+    drawAll();
+}
+
+function getExactRadians(rad) {
+    let n = (rad % (2 * Math.PI)) / Math.PI;
+    if (n < 0) n += 2;
+    if (Math.abs(n) < 0.01) return "0";
+    if (Math.abs(n - 1) < 0.01) return "π";
+
+    const fractions = [
+        {v: 1/6, t: "π/6"}, {v: 1/4, t: "π/4"}, {v: 1/3, t: "π/3"}, {v: 1/2, t: "π/2"},
+        {v: 2/3, t: "2π/3"}, {v: 3/4, t: "3π/4"}, {v: 5/6, t: "5π/6"},
+        {v: 7/6, t: "7π/6"}, {v: 5/4, t: "5π/4"}, {v: 4/3, t: "4π/3"}, {v: 3/2, t: "3π/2"},
+        {v: 5/3, t: "5π/3"}, {v: 7/4, t: "7π/4"}, {v: 11/6, t: "11π/6"}
+    ];
+
+    for (let f of fractions) {
+        if (Math.abs(n - f.v) < 0.02) return f.t;
+    }
+    return n.toFixed(2) + "π";
+}
+
     circleCanvas.addEventListener('mousedown', () => isDragging = true);
     window.addEventListener('mouseup', () => isDragging = false);
     window.addEventListener('mousemove', (e) => isDragging && handle(e));
@@ -352,6 +503,8 @@
     circleCanvas.addEventListener('touchmove', (e) => { isDragging && handle(e); e.preventDefault(); }, {passive: false});
 
     renderPills(); drawAll();
+    
+    
 </script>
 </body>
 </html>
