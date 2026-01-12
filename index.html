@@ -119,6 +119,14 @@
     -webkit-appearance: none; margin: 0;
 }
 
+.eye-btn {
+    display: flex; align-items: center; justify-content: center;
+    margin-left: 8px; cursor: pointer; color: #888;
+    transition: 0.2s; padding: 2px; border-radius: 4px;
+}
+.eye-btn:hover { background: rgba(0,0,0,0.05); color: #333; }
+.eye-btn.hidden { opacity: 0.4; }
+
     </style>
 </head>
 <body>
@@ -161,6 +169,8 @@
 </div>
 
 <script>
+    
+    
     const circleCanvas = document.getElementById('circleCanvas');
     const circleCtx = circleCanvas.getContext('2d');
     const graphCanvas = document.getElementById('graphCanvas');
@@ -171,6 +181,18 @@
     let mode = 'sin';
     const allFuncs = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot'];
     
+    // Estado de visibilidad (por defecto solo sin y cos activos para no saturar)
+const visibility = { 
+    sin: true, cos: true, tan: true, 
+    csc: true, sec: true, cot: true 
+};
+
+function toggleVisibility(f, event) {
+    event.stopPropagation(); // Evita que se cambie el modo principal al hacer clic en el ojo
+    visibility[f] = !visibility[f];
+    renderPills();
+    drawAll();
+}
     // Colores iniciales
     const colors = { 
         sin:'#FF2D55', cos:'#007AFF', tan:'#FF9500', 
@@ -219,69 +241,106 @@
 
     function drawAll() { drawCircle(); drawGraph(); updateText(); }
 
-    function drawCircle() {
-        const cx = 250, cy = 250, r = 160;
-        circleCtx.clearRect(0, 0, 500, 500);
+   function drawCircle() {
+    const cx = 250, cy = 250, r = 160;
+    circleCtx.clearRect(0, 0, 500, 500);
 
-        // Fondo y Ejes
-        circleCtx.strokeStyle = '#f0f0f0'; circleCtx.lineWidth = 2;
-        circleCtx.beginPath(); circleCtx.moveTo(0, cy); circleCtx.lineTo(500, cy); circleCtx.moveTo(cx, 0); circleCtx.lineTo(cx, 500); circleCtx.stroke();
+    // Fondo y Ejes (Se mantienen siempre visibles)
+    circleCtx.strokeStyle = '#f0f0f0'; circleCtx.lineWidth = 2;
+    circleCtx.beginPath(); circleCtx.moveTo(0, cy); circleCtx.lineTo(500, cy); circleCtx.moveTo(cx, 0); circleCtx.lineTo(cx, 500); circleCtx.stroke();
+    
+    // Fondo y Ejes - Etiquetas de unidad con más margen
+circleCtx.font = '700 12px "Open Sans"'; circleCtx.fillStyle = '#999';
+
+// Eje X
+circleCtx.textAlign = 'left'; circleCtx.fillText('1', cx + r + 60, cy + 0);    // Antes +5
+circleCtx.textAlign = 'right'; circleCtx.fillText('-1', cx - r - 60, cy +0); // Antes -5
+
+// Eje Y
+circleCtx.textAlign = 'center'; 
+circleCtx.fillText('1', cx, cy - r - 60);   // Antes -5
+circleCtx.fillText('-1', cx, cy + r + 60);  // Antes +15 (ajustado para mantener equilibrio)
+
+    const notablesDeg = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330];
+    notablesDeg.forEach(deg => {
+        const rad = deg * Math.PI / 180;
+        const lx = cx + (r + 25) * Math.cos(rad);
+        const ly = cy - (r + 25) * Math.sin(rad);
+        circleCtx.font = '600 11px "Open Sans"';
+        circleCtx.fillStyle = '#999';
+        circleCtx.textAlign = 'center';
+        circleCtx.textBaseline = 'middle';
+        circleCtx.fillText(deg + '°', lx, ly);
+    });
+
+    circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
+    circleCtx.beginPath(); circleCtx.arc(cx, cy, r, 0, Math.PI * 2); circleCtx.stroke();
+
+    const x = cx + r * Math.cos(currentAngle);
+    const y = cy - r * Math.sin(currentAngle);
+    const sinV = Math.sin(currentAngle), cosV = Math.cos(currentAngle);
+
+    if (Math.abs(sinV) > 0.001 && Math.abs(cosV) > 0.001) {
+        const tanV = Math.tan(currentAngle), cotV = 1/tanV, secV = 1/cosV, cscV = 1/sinV;
+        const tanX = cx + r, tanY = cy - r * tanV;
+        const cotX = cx + r * cotV, cotY = cy - (sinV >= 0 ? r : -r);
+        const secX = cx + r * secV, cscY = cy - r * cscV;
+
+        // --- LINEAS PUNTEADAS (PROYECCIONES) ---
+        circleCtx.setLineDash([5, 5]); circleCtx.lineWidth = 2;
         
-        circleCtx.font = '700 12px "Open Sans"'; circleCtx.fillStyle = '#999';
-        circleCtx.textAlign = 'left'; circleCtx.fillText('1', cx + r + 5, cy + 4);
-        circleCtx.textAlign = 'right'; circleCtx.fillText('-1', cx - r - 5, cy + 4);
-        circleCtx.textAlign = 'center'; circleCtx.fillText('1', cx, cy - r - 5); circleCtx.fillText('-1', cx, cy + r + 15);
-
-        const notablesDeg = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330];
-        notablesDeg.forEach(deg => {
-            const rad = deg * Math.PI / 180;
-            const lx = cx + (r + 25) * Math.cos(rad);
-            const ly = cy - (r + 25) * Math.sin(rad);
-            circleCtx.font = '600 11px "Open Sans"';
-            circleCtx.fillStyle = '#999';
-            circleCtx.textAlign = 'center';
-            circleCtx.textBaseline = 'middle';
-            circleCtx.fillText(deg + '°', lx, ly);
-        });
-
-        circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
-        circleCtx.beginPath(); circleCtx.arc(cx, cy, r, 0, Math.PI * 2); circleCtx.stroke();
-
-        const x = cx + r * Math.cos(currentAngle);
-        const y = cy - r * Math.sin(currentAngle);
-        const sinV = Math.sin(currentAngle), cosV = Math.cos(currentAngle);
-
-        if (Math.abs(sinV) > 0.001 && Math.abs(cosV) > 0.001) {
-            const tanV = Math.tan(currentAngle), cotV = 1/tanV, secV = 1/cosV, cscV = 1/sinV;
-            const tanX = cx + r, tanY = cy - r * tanV;
-            const cotX = cx + r * cotV, cotY = cy - (sinV >= 0 ? r : -r);
-            const secX = cx + r * secV, cscY = cy - r * cscV;
-
-            circleCtx.setLineDash([5, 5]); circleCtx.lineWidth = 2;
+        if(visibility.sin) {
             circleCtx.strokeStyle = colors.sin; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(cx, y); circleCtx.stroke();
+        }
+        if(visibility.cos) {
             circleCtx.strokeStyle = colors.cos; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(x, cy); circleCtx.stroke();
+        }
+        if(visibility.tan) {
             circleCtx.strokeStyle = colors.tan; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(tanX, tanY); circleCtx.stroke();
+        }
+        if(visibility.cot) {
             circleCtx.strokeStyle = colors.cot; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
+        }
+        if(visibility.sec) {
             circleCtx.strokeStyle = colors.sec; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(secX, cy); circleCtx.stroke();
+        }
+        if(visibility.csc) {
             circleCtx.strokeStyle = colors.csc; circleCtx.beginPath(); circleCtx.moveTo(x, y); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
-            circleCtx.setLineDash([]);
+        }
+        
+        circleCtx.setLineDash([]);
 
-            circleCtx.lineWidth = 4;
+        // --- LINEAS GRUESAS (REPRESENTACIONES EXTERNAS) ---
+        circleCtx.lineWidth = 4;
+        if(visibility.sec) {
             circleCtx.strokeStyle = colors.sec; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(secX, cy); circleCtx.stroke();
+        }
+        if(visibility.csc) {
             circleCtx.strokeStyle = colors.csc; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(cx, cscY); circleCtx.stroke();
+        }
+        if(visibility.tan) {
             circleCtx.strokeStyle = colors.tan; circleCtx.beginPath(); circleCtx.moveTo(tanX, cy); circleCtx.lineTo(tanX, tanY); circleCtx.stroke();
+        }
+        if(visibility.cot) {
             circleCtx.strokeStyle = colors.cot; circleCtx.beginPath(); circleCtx.moveTo(cx, cotY); circleCtx.lineTo(cotX, cotY); circleCtx.stroke();
         }
-
-        circleCtx.lineWidth = 7;
-        circleCtx.strokeStyle = colors.cos; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke();
-        circleCtx.strokeStyle = colors.sin; circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
-
-        circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
-        circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
-        circleCtx.fillStyle = '#fff'; circleCtx.beginPath(); circleCtx.arc(x, y, 8, 0, Math.PI * 2); circleCtx.fill();
-        circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 3; circleCtx.stroke();
     }
+
+    // --- LINEAS PRINCIPALES (SEN / COS DENTRO DEL CÍRCULO) ---
+    circleCtx.lineWidth = 7;
+    if(visibility.cos) {
+        circleCtx.strokeStyle = colors.cos; circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, cy); circleCtx.stroke();
+    }
+    if(visibility.sin) {
+        circleCtx.strokeStyle = colors.sin; circleCtx.beginPath(); circleCtx.moveTo(x, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
+    }
+
+    // Radio y Punto de arrastre (Se mantienen siempre para poder interactuar)
+    circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 2;
+    circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
+    circleCtx.fillStyle = '#fff'; circleCtx.beginPath(); circleCtx.arc(x, y, 8, 0, Math.PI * 2); circleCtx.fill();
+    circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 3; circleCtx.stroke();
+}
 
     function drawGraph() {
         const w = 500, h = 500, midY = h / 2, amp = 120;
@@ -447,9 +506,19 @@ function renderPills() {
         p.innerText = f.toUpperCase();
         p.onclick = () => { mode = f; renderPills(); drawAll(); };
         
+        const eyeBtn = document.createElement('div');
+    eyeBtn.className = `eye-btn ${!visibility[f] ? 'hidden' : ''}`;
+    // Si la visibilidad es falsa, muestra eye-off
+    eyeBtn.innerHTML = visibility[f] 
+        ? `<i data-lucide="eye" size="14"></i>` 
+        : `<i data-lucide="eye-off" size="14"></i>`;
+    eyeBtn.onclick = (e) => toggleVisibility(f, e);
+        
         wrapper.appendChild(colorInp);
         wrapper.appendChild(p);
+        wrapper.appendChild(eyeBtn);
         container.appendChild(wrapper);
+        
     });
 
     // Inicializar iconos de Lucide para que se rendericen los nuevos cambios
