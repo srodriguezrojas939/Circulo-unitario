@@ -45,14 +45,43 @@
         }
         .pill.active { border: 1px solid rgba(0,0,0,0.1); color: #fff !important; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
-        @media (max-width: 950px) { .main-grid { grid-template-columns: 1fr; } }
+        /* Mejora de la Rejilla Principal */
+.main-grid { 
+    display: flex; /* Cambiamos a Flex para mejor control horizontal */
+    justify-content: center;
+    background: #fdfdfd; /* Fondo muy claro para todo el panel */
+    padding: 20px;
+    border-radius: 40px;
+    gap: 0; /* Sin espacio entre tarjetas para que la línea se vea continua */
+    border: 1px solid #ddd;
+}
 
-        .canvas-card {
-            background: white; border-radius: 35px; padding: 25px; position: relative;
-            border: 1px solid #ddd; display: flex; flex-direction: column; align-items: center;
-        }
-        canvas { max-width: 100%; height: auto; z-index: 1; cursor: crosshair; }
+.canvas-card {
+    background: white;
+    padding: 10px;
+    border: none; /* Quitamos bordes internos */
+    border-radius: 0;
+}
+
+/* Redondeamos solo las esquinas exteriores */
+.canvas-card:first-child { border-radius: 30px 0 0 30px; border-right: 1px solid #eee; }
+.canvas-card:last-child { border-radius: 0 30px 30px 0; }
+
+@media (max-width: 950px) { 
+    .main-grid { flex-direction: column; } 
+    .canvas-card:first-child, .canvas-card:last-child { border-radius: 20px; border: none; }
+}
+
+@media (max-width: 950px) { 
+    .main-grid { grid-template-columns: 1fr; border-radius: 30px; } 
+}
+
+/* Ocultar tarjetas cuando la visibilidad es false */
+.data-item.hidden {
+    display: none;
+}
+
+
 
         .data-panel {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -199,15 +228,32 @@ function toggleVisibility(f, event) {
         csc:'#28CD41', sec:'#FF69B4', cot:'#5AC8FA' 
     };
 
-    const exactValues = {
-        0:   { sin:'0', cos:'1', tan:'0', csc:'∞', sec:'1', cot:'∞' },
-        30:  { sin:'1/2', cos:'√3/2', tan:'√3/3', csc:'2', sec:'2√3/3', cot:'√3' },
-        45:  { sin:'√2/2', cos:'√2/2', tan:'1', csc:'√2', sec:'√2', cot:'1' },
-        60:  { sin:'√3/2', cos:'1/2', tan:'√3', csc:'2√3/3', sec:'2', cot:'√3/3' },
-        90:  { sin:'1', cos:'0', tan:'∞', csc:'1', sec:'∞', cot:'0' },
-        180: { sin:'0', cos:'-1', tan:'0', csc:'∞', sec:'-1', cot:'∞' },
-        270: { sin:'-1', cos:'0', tan:'∞', csc:'-1', sec:'∞', cot:'0' }
-    };
+   const exactValues = {
+    // --- CUADRANTE I ---
+    0:   { sin:'0', cos:'1', tan:'0', csc:'∞', sec:'1', cot:'∞' },
+    30:  { sin:'1/2', cos:'√3/2', tan:'√3/3', csc:'2', sec:'2√3/3', cot:'√3' },
+    45:  { sin:'√2/2', cos:'√2/2', tan:'1', csc:'√2', sec:'√2', cot:'1' },
+    60:  { sin:'√3/2', cos:'1/2', tan:'√3', csc:'2√3/3', sec:'2', cot:'√3/3' },
+    90:  { sin:'1', cos:'0', tan:'∞', csc:'1', sec:'∞', cot:'0' },
+
+    // --- CUADRANTE II ---
+    120: { sin:'√3/2', cos:'-1/2', tan:'-√3', csc:'2√3/3', sec:'-2', cot:'-√3/3' },
+    135: { sin:'√2/2', cos:'-√2/2', tan:'-1', csc:'√2', sec:'-√2', cot:'-1' },
+    150: { sin:'1/2', cos:'-√3/2', tan:'-√3/3', csc:'2', sec:'-2√3/3', cot:'-√3' },
+    180: { sin:'0', cos:'-1', tan:'0', csc:'∞', sec:'-1', cot:'∞' },
+
+    // --- CUADRANTE III ---
+    210: { sin:'-1/2', cos:'-√3/2', tan:'√3/3', csc:'-2', sec:'-2√3/3', cot:'√3' },
+    225: { sin:'-√2/2', cos:'-√2/2', tan:'1', csc:'-√2', sec:'-√2', cot:'1' },
+    240: { sin:'-√3/2', cos:'-1/2', tan:'√3', csc:'-2√3/3', sec:'-2', cot:'√3/3' },
+    270: { sin:'-1', cos:'0', tan:'∞', csc:'-1', sec:'∞', cot:'0' },
+
+    // --- CUADRANTE IV ---
+    300: { sin:'-√3/2', cos:'1/2', tan:'-√3', csc:'-2√3/3', sec:'2', cot:'-√3/3' },
+    315: { sin:'-√2/2', cos:'1/2', tan:'-1', csc:'-√2', sec:'√2', cot:'-1' },
+    330: { sin:'-1/2', cos:'√3/2', tan:'-√3/3', csc:'-2', sec:'2√3/3', cot:'-√3' },
+    360: { sin:'0', cos:'1', tan:'0', csc:'∞', sec:'1', cot:'∞' }
+};
 
     function renderPills() {
         const container = document.getElementById('pills-container');
@@ -340,47 +386,157 @@ circleCtx.fillText('-1', cx, cy + r + 60);  // Antes +15 (ajustado para mantener
     circleCtx.beginPath(); circleCtx.moveTo(cx, cy); circleCtx.lineTo(x, y); circleCtx.stroke();
     circleCtx.fillStyle = '#fff'; circleCtx.beginPath(); circleCtx.arc(x, y, 8, 0, Math.PI * 2); circleCtx.fill();
     circleCtx.strokeStyle = '#333'; circleCtx.lineWidth = 3; circleCtx.stroke();
-}
+    
+    // --- LÍNEA PUENTE HACIA LA GRÁFICA ---
+circleCtx.setLineDash([5, 5]);
+circleCtx.strokeStyle = 'rgba(0,0,0,0.2)'; // Gris tenue
+circleCtx.lineWidth = 1;
+circleCtx.beginPath();
 
-    function drawGraph() {
-        const w = 500, h = 500, midY = h / 2, amp = 120;
-        graphCtx.clearRect(0, 0, 500, 500);
-        const fns = { sin: Math.sin, cos: Math.cos, tan: Math.tan, csc: a => 1/Math.sin(a), sec: a => 1/Math.cos(a), cot: a => 1/Math.tan(a) };
+// --- LÍNEA DE GUÍA VERTICAL EN EL CÍRCULO ---
+circleCtx.setLineDash([5, 5]);
+circleCtx.strokeStyle = 'rgba(0,0,0,0.1)'; // Estilo tenue igual al de la gráfica
+circleCtx.lineWidth = 1;
+circleCtx.beginPath();
 
-        graphCtx.strokeStyle = '#eee'; graphCtx.lineWidth = 2;
-        graphCtx.beginPath(); graphCtx.moveTo(50, 0); graphCtx.lineTo(50, h); graphCtx.moveTo(0, midY); graphCtx.lineTo(w, midY); graphCtx.stroke();
+// Dibujamos la línea que cruza todo el canvas verticalmente pasando por 'x'
+circleCtx.moveTo(x, 0);
+circleCtx.lineTo(x, 500);
+circleCtx.stroke();
 
-        graphCtx.fillStyle = '#999'; graphCtx.font = '700 11px "Open Sans"';
-        graphCtx.textAlign = 'right'; graphCtx.fillText('1', 45, midY - amp + 4); graphCtx.fillText('-1', 45, midY + amp + 4);
-        
-        const labelsPi = [{ x: 50, t: '0' }, { x: 150, t: 'π/2' }, { x: 250, t: 'π' }, { x: 350, t: '3π/2' }, { x: 450, t: '2π' }];
-        graphCtx.textAlign = 'center';
-        labelsPi.forEach(l => {
-            graphCtx.fillText(l.t, l.x, midY + 25);
-            graphCtx.beginPath(); graphCtx.moveTo(l.x, midY - 5); graphCtx.lineTo(l.x, midY + 5); graphCtx.stroke();
-        });
+if (visibility[mode]) { // Solo si la función actual es visible
+    circleCtx.setLineDash([5, 5]);
+    circleCtx.strokeStyle = colors[mode] + '66'; // Mismo color con transparencia
+    circleCtx.lineWidth = 1;
+    circleCtx.beginPath();
 
-        graphCtx.strokeStyle = colors[mode]; graphCtx.lineWidth = 3;
-        graphCtx.beginPath();
-        for(let i = 0; i <= 400; i++) {
-            const a = (i / 400) * Math.PI * 2;
-            let v = fns[mode](a);
-            if(Math.abs(v) > 15) v = v > 0 ? 15 : -15; 
-            const py = midY - v * amp;
-            if (['tan','csc','sec','cot'].includes(mode) && Math.abs(fns[mode](a)) > 10 && i > 0) { graphCtx.stroke(); graphCtx.beginPath(); }
-            else { if(i === 0) graphCtx.moveTo(50+i, py); else graphCtx.lineTo(50+i, py); }
-        }
-        graphCtx.stroke();
+    let anchorX, anchorY;
 
-        let n = currentAngle % (Math.PI * 2); if(n < 0) n += Math.PI * 2;
-        let vm = fns[mode](n);
-        if(Math.abs(vm) < 10) {
-            const mx = 50 + (n / (Math.PI * 2)) * 400, my = midY - vm * amp;
-            graphCtx.fillStyle = colors[mode]; graphCtx.beginPath(); graphCtx.arc(mx, my, 7, 0, Math.PI * 2); graphCtx.fill();
-            graphCtx.strokeStyle = '#fff'; graphCtx.lineWidth = 2; graphCtx.stroke();
-        }
+    // Lógica de anclaje según la naturaleza de la función
+    switch(mode) {
+        case 'sin': anchorX = x; anchorY = y; break;
+        case 'cos': anchorX = x; anchorY = cy; break; // Nace desde el eje X
+        case 'tan': anchorX = cx + r; anchorY = cy - r * Math.tan(currentAngle); break;
+        case 'sec': anchorX = cx + r * (1/Math.cos(currentAngle)); anchorY = cy; break;
+        case 'csc': anchorX = cx; anchorY = cy - r * (1/Math.sin(currentAngle)); break;
+        case 'cot': anchorX = cx + r * (1/Math.tan(currentAngle)); anchorY = cy - (Math.sin(currentAngle) >= 0 ? r : -r); break;
     }
 
+    // Solo dibujamos si el valor es razonable (evita saltos al infinito)
+    const val = Math.abs(Math.sin(currentAngle)); // Referencia para funciones infinitas
+    if (Math.abs(anchorY - cy) < 1000) {
+        circleCtx.moveTo(anchorX, anchorY);
+        circleCtx.lineTo(500, anchorY); // Viaja al borde del canvas
+        circleCtx.stroke();
+    }
+    circleCtx.setLineDash([]);
+}
+}
+function drawGraph() {
+    const w = 500, h = 500, midY = h / 2, amp = 160; // Sincronizado con el radio r=160
+    graphCtx.clearRect(0, 0, 500, 500);
+
+    const fns = { 
+        sin: Math.sin, 
+        cos: Math.cos, 
+        tan: Math.tan, 
+        csc: a => 1/Math.sin(a), 
+        sec: a => 1/Math.cos(a), 
+        cot: a => 1/Math.tan(a) 
+    };
+
+    // 1. Cálculos de posición actual (Se calculan una sola vez)
+    let n = currentAngle % (Math.PI * 2); 
+    if(n < 0) n += Math.PI * 2;
+    let vm = fns[mode](n);
+    const gx = 50 + (n / (Math.PI * 2)) * 400; // Mapeo de 0-2π al ancho del gráfico
+    const my = midY - vm * amp;
+
+    // 2. Dibujo de Ejes (Al fondo)
+    graphCtx.strokeStyle = '#eee'; 
+    graphCtx.lineWidth = 2;
+    graphCtx.beginPath(); 
+    graphCtx.moveTo(50, 0); graphCtx.lineTo(50, h);   // Eje Y
+    graphCtx.moveTo(0, midY); graphCtx.lineTo(w, midY); // Eje X
+    graphCtx.stroke();
+
+    // 3. Líneas de Guía (Vínculo visual)
+    graphCtx.setLineDash([5, 5]);
+    
+    // --- LÍNEA PUENTE HORIZONTAL (Viene del círculo) ---
+    graphCtx.strokeStyle = 'rgba(0,0,0,0.15)'; // Gris tenue para no distraer
+    graphCtx.beginPath();
+    graphCtx.moveTo(0, my); 
+    graphCtx.lineTo(gx, my);
+    graphCtx.stroke();
+
+    // --- LÍNEA DE GUÍA VERTICAL (Posición del ángulo) ---
+    graphCtx.strokeStyle = 'rgba(0,0,0,0.1)'; 
+    graphCtx.beginPath();
+    graphCtx.moveTo(gx, 0); 
+    graphCtx.lineTo(gx, h);
+    graphCtx.stroke();
+    
+    graphCtx.setLineDash([]); // Resetear estilo de línea
+
+    // 4. Etiquetas de escala y radianes
+    graphCtx.fillStyle = '#999'; 
+    graphCtx.font = '700 11px "Open Sans"';
+    graphCtx.textAlign = 'right'; 
+    graphCtx.fillText('1', 45, midY - amp + 4); 
+    graphCtx.fillText('-1', 45, midY + amp + 4);
+    
+    const labelsPi = [
+        { x: 50, t: '0' }, 
+        { x: 150, t: 'π/2' }, 
+        { x: 250, t: 'π' }, 
+        { x: 350, t: '3π/2' }, 
+        { x: 450, t: '2π' }
+    ];
+    graphCtx.textAlign = 'center';
+    labelsPi.forEach(l => {
+        graphCtx.fillText(l.t, l.x, midY + 25);
+        graphCtx.beginPath(); 
+        graphCtx.moveTo(l.x, midY - 5); 
+        graphCtx.lineTo(l.x, midY + 5); 
+        graphCtx.stroke();
+    });
+
+    // 5. Dibujo de la curva de la función
+    graphCtx.strokeStyle = colors[mode]; 
+    graphCtx.lineWidth = 3;
+    graphCtx.beginPath();
+    for(let i = 0; i <= 400; i++) {
+        const a = (i / 400) * Math.PI * 2;
+        let v = fns[mode](a);
+        
+        // Evitar que las funciones infinitas (tan, csc...) ensucien el canvas
+        if(Math.abs(v) > 15) v = v > 0 ? 15 : -15; 
+        const py = midY - v * amp;
+
+        if (['tan','csc','sec','cot'].includes(mode) && Math.abs(fns[mode](a)) > 10 && i > 0) { 
+            graphCtx.stroke(); 
+            graphCtx.beginPath(); 
+        } else { 
+            if(i === 0) graphCtx.moveTo(50+i, py); 
+            else graphCtx.lineTo(50+i, py); 
+        }
+    }
+    graphCtx.stroke();
+
+    // 6. Punto indicador (La "bola" que recorre la curva)
+    if(Math.abs(vm) < 10) { // Solo dibujar si no está en el infinito
+        graphCtx.fillStyle = colors[mode]; 
+        graphCtx.beginPath(); 
+        graphCtx.arc(gx, my, 7, 0, Math.PI * 2); 
+        graphCtx.fill();
+        graphCtx.strokeStyle = '#fff'; 
+        graphCtx.lineWidth = 2; 
+        graphCtx.stroke();
+    }
+}
+
+    
     function updateText() {
         let n = currentAngle % (Math.PI * 2); if(n < 0) n += Math.PI * 2;
         let deg = Math.round(n * 180 / Math.PI);
