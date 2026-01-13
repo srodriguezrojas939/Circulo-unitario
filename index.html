@@ -57,23 +57,33 @@
 }
 
 .canvas-card {
-    background: white;
-    padding: 10px;
-    border: none; /* Quitamos bordes internos */
-    border-radius: 0;
+    background: white; 
+    padding: 15px; /* Un poco más de aire para que no toque los bordes */
+    width: 100%; 
+    max-width: 500px; 
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Esto evita que cualquier línea se escape del borde redondeado */
 }
 
-/* Redondeamos solo las esquinas exteriores */
-.canvas-card:first-child { border-radius: 30px 0 0 30px; border-right: 1px solid #eee; }
-.canvas-card:last-child { border-radius: 0 30px 30px 0; }
-
-@media (max-width: 950px) { 
-    .main-grid { flex-direction: column; } 
-    .canvas-card:first-child, .canvas-card:last-child { border-radius: 20px; border: none; }
+canvas {
+    width: 100% !important; 
+    height: auto !important; 
+    max-width: 500px; /* Evita que en pantallas gigantes el círculo se vea gigante y borroso */
+    display: block;
 }
 
 @media (max-width: 950px) { 
-    .main-grid { grid-template-columns: 1fr; border-radius: 30px; } 
+    .main-grid { 
+        flex-direction: column; /* Apila el círculo arriba y la gráfica abajo */
+        padding: 10px;
+    }
+    .canvas-card {
+        border-radius: 20px; /* Redondea todos los bordes en móvil */
+        margin-bottom: 10px; /* Separa el círculo de la gráfica */
+    }
 }
 
 /* Ocultar tarjetas cuando la visibilidad es false */
@@ -719,6 +729,15 @@ function getExactRadians(rad) {
         if (Math.abs(n - f.v) < 0.02) return f.t;
     }
     return n.toFixed(2) + "π";
+}
+
+function fixDPI(canvas) {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr * (rect.width/500), dpr * (rect.height/500)); // Ajuste proporcional
 }
 
     circleCanvas.addEventListener('mousedown', () => isDragging = true);
